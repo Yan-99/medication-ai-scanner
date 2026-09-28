@@ -417,6 +417,9 @@
     const stopCameraBtnStep2 =
         document.getElementById("stop-camera-btn-step-2");
 
+    const cameraStatusStep2 =
+        document.getElementById("camera-status-step-2");
+
     const verifyBtn =
         document.getElementById("verify-btn");
 
@@ -548,6 +551,9 @@
             cameraStatus.innerText =
                 "Rear camera active";
 
+            cameraStatusStep2.innerText = 
+                "Rear camera active";
+
         }
 
         catch (error) {
@@ -623,6 +629,9 @@
 
 
         cameraStatus.innerText =
+            "Camera is off.";
+
+        cameraStatusStep2.innerText = 
             "Camera is off.";
 
         cameraStatus.className = "";
