@@ -1,20 +1,31 @@
 import os
 import json
-from supabase import create_client, Client
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
+from supabase import create_client, Client
 
-# Find the templates folder relative to this script's directory in the cloud
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 template_dir = os.path.join(current_dir, "templates")
 
 app = Flask(__name__, template_folder=template_dir)
 
-# Initialize OpenAI client
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-client = OpenAI(api_key=OPENAI_API_KEY)
 
-# Supabase
+# ============================================================
+# API CONFIGURATION
+# ============================================================
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+client = OpenAI(
+    api_key=OPENAI_API_KEY
+)
+
+
+# ============================================================
+# SUPABASE CONFIGURATION
+# ============================================================
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
@@ -24,38 +35,60 @@ supabase: Client = create_client(
 )
 
 
+# ============================================================
+# HOME PAGE
+# ============================================================
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
 
+# ============================================================
+# MEDICATION VERIFICATION
+# ============================================================
+
 @app.route("/verify", methods=["POST"])
 def verify_medication():
+
     data = request.get_json()
 
-    # Check that all required data was received
+    # --------------------------------------------------------
+    # Validate request
+    # --------------------------------------------------------
+
     if (
         not data
         or "staffId" not in data
         or "medImage" not in data
         or "labelImage" not in data
     ):
-        return jsonify(
-            {
-                "error": "Staff ID, medication image, and prescription label image are required."
-            }
-        ), 400
+        return jsonify({
+            "error": "Staff ID, medication image, and prescription label image are required."
+        }), 400
 
     staff_id = data["staffId"]
 
+
+    # --------------------------------------------------------
+    # Extract Base64 image data
+    # --------------------------------------------------------
+
     try:
-        # Extract only the Base64 image data
         med_image_clean = data["medImage"].split(",")[1]
         label_image_clean = data["labelImage"].split(",")[1]
-    except (IndexError, AttributeError):
-        return jsonify({"error": "Invalid image format received."}), 400
 
-    # Ask the AI to return a predictable JSON structure
+    except (IndexError, AttributeError):
+
+        return jsonify({
+            "error": "Invalid image format received."
+        }), 400
+
+
+    # ========================================================
+    # AI VERIFICATION PROMPT
+    # ========================================================
+
     prompt = """
 You are a strict medication verification assistant.
 
@@ -106,66 +139,146 @@ Do not include ```json.
 Do not include any text outside the JSON object.
 """
 
+
+    # ========================================================
+    # CALL OPENAI
+    # ========================================================
+
     try:
+
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
                     "role": "user",
                     "content": [
+
                         {
                             "type": "text",
-                            "text": prompt,
+                            "text": prompt
                         },
+
                         {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{med_image_clean}"
-                            },
+                            }
                         },
+
                         {
                             "type": "image_url",
                             "image_url": {
                                 "url": f"data:image/jpeg;base64,{label_image_clean}"
-                            },
-                        },
-                    ],
+                            }
+                        }
+
+                    ]
                 }
             ],
-            max_tokens=300,
+            max_tokens=300
         )
 
-        # Get the AI's response
+
         raw_result = response.choices[0].message.content
 
-        # Convert the AI's JSON response into a Python dictionary
+
+        # ----------------------------------------------------
+        # Convert AI response into JSON
+        # ----------------------------------------------------
+
         try:
+
             result = json.loads(raw_result)
 
         except json.JSONDecodeError:
-            # If the AI returned something other than valid JSON,
-            # return the raw response so we can diagnose the problem.
-            return jsonify(
-                {
-                    "error": "The AI returned an invalid response format.",
-                    "raw_response": raw_result,
-                }
-            ), 500
 
-        # Add Staff ID to the structured result
+            return jsonify({
+                "error": "The AI returned an invalid response format.",
+                "raw_response": raw_result
+            }), 500
+
+
+        # ====================================================
+        # SAVE VERIFICATION TO SUPABASE
+        # ====================================================
+
+        try:
+
+            supabase.table("scan_records").insert({
+
+                "staff_id": staff_id,
+
+                "medication_name": result.get(
+                    "medication_name"
+                ),
+
+                "medication_strength": result.get(
+                    "medication_strength"
+                ),
+
+                "label_name": result.get(
+                    "label_name"
+                ),
+
+                "label_strength": result.get(
+                    "label_strength"
+                ),
+
+                "match": result.get(
+                    "match"
+                ),
+
+                "confidence": result.get(
+                    "confidence"
+                ),
+
+                "reason": result.get(
+                    "reason"
+                )
+
+            }).execute()
+
+
+        except Exception as db_error:
+
+            # Print the detailed error to Vercel logs
+            print(
+                "Supabase database error:",
+                str(db_error)
+            )
+
+            return jsonify({
+                "error": "Verification succeeded, but the audit record could not be saved."
+            }), 500
+
+
+        # ====================================================
+        # RETURN RESULT TO FRONTEND
+        # ====================================================
+
         result["staff_id"] = staff_id
 
-        # Return structured verification result
-        return jsonify(
-            {
-                "result": result
-            }
-        )
+        return jsonify({
+            "result": result
+        })
+
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+
+        print(
+            "Verification error:",
+            str(e)
+        )
+
+        return jsonify({
+            "error": "An error occurred during medication verification."
+        }), 500
 
 
-# Expose app for Vercel WSGI
+# ============================================================
+# VERCEL HANDLER
+# ============================================================
+
 app.debug = True
+
 handler = app
