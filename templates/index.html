@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Medication Scanner</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; text-align: center; background: #f5f5f7; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        video { width: 100%; border-radius: 8px; background: #000; transform: scaleX(-1); } /* Mirror mode */
+        button { background: #0071e3; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+        button:hover { background: #0077ed; }
+        #result-box { margin-top: 25px; padding: 15px; border-radius: 8px; background: #e8e8ed; text-align: left; white-space: pre-line; display: none; }
+        .loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Medication Verification Scanner</h2>
+    <p>Hold up your medication box and label, then click verify.</p>
+    
+    <!-- Live webcam video container -->
+    <video id="webcam" autoplay playsinline></video>
+    <br>
+    <button id="capture-btn">Scan & Verify Match</button>
+
+    <div id="result-box">
+        <h3>Verification Result:</h3>
+        <p id="output-text"></p>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('webcam');
+    const button = document.getElementById('capture-btn');
+    const resultBox = document.getElementById('result-box');
+    const outputText = document.getElementById('output-text');
+
+    // 1. Request access to the user's laptop camera
+    navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => { alert("Error accessing webcam: " + err); });
+
+    // 2. Capture a frame and send it to the Python backend when clicked
+    button.addEventListener('click', () => {
+        // Create an invisible canvas element to grab the frame
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw the current video frame onto the canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Convert the canvas image to a base64 Data URL string
+        const imageDataUrl = canvas.toDataURL('image/jpeg');
+
+        // Show loading status
+        resultBox.style.display = 'block';
+        outputText.className = 'loading';
+        outputText.innerText = 'AI is analyzing your scan... please hold still.';
+
+        // Send data to the Flask Python server via an HTTP POST request
+        fetch('/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: imageDataUrl })
+        })
+        .then(res => res.json())
+        .then(data => {
+            outputText.className = '';
+            if (data.result) {
+                outputText.innerText = data.result;
+            } else if (data.error) {
+                outputText.innerText = "Error: " + data.error;
+            }
+        })
+        .catch(err => {
+            outputText.className = '';
+            outputText.innerText = "Network error connecting to backend.";
+        });
+    });
+</script>
+
+</body>
+</html>
