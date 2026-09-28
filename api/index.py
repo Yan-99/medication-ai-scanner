@@ -1,8 +1,10 @@
 import os
 import json
+import urllib.request
+import urllib.error
+
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
-from supabase import create_client, Client
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -12,7 +14,7 @@ app = Flask(__name__, template_folder=template_dir)
 
 
 # ============================================================
-# API CONFIGURATION
+# OPENAI CONFIGURATION
 # ============================================================
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -28,11 +30,6 @@ client = OpenAI(
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
-supabase: Client = create_client(
-    SUPABASE_URL,
-    SUPABASE_KEY
-)
 
 
 # ============================================================
@@ -75,6 +72,7 @@ def verify_medication():
     # --------------------------------------------------------
 
     try:
+
         med_image_clean = data["medImage"].split(",")[1]
         label_image_clean = data["labelImage"].split(",")[1]
 
@@ -183,7 +181,7 @@ Do not include any text outside the JSON object.
 
 
         # ----------------------------------------------------
-        # Convert AI response into JSON
+        # Parse AI JSON
         # ----------------------------------------------------
 
         try:
@@ -199,57 +197,127 @@ Do not include any text outside the JSON object.
 
 
         # ====================================================
-        # SAVE VERIFICATION TO SUPABASE
+        # SAVE AUDIT RECORD TO SUPABASE
         # ====================================================
+
+        record = {
+            "staff_id": staff_id,
+
+            "medication_name": result.get(
+                "medication_name"
+            ),
+
+            "medication_strength": result.get(
+                "medication_strength"
+            ),
+
+            "label_name": result.get(
+                "label_name"
+            ),
+
+            "label_strength": result.get(
+                "label_strength"
+            ),
+
+            "match": result.get(
+                "match"
+            ),
+
+            "confidence": result.get(
+                "confidence"
+            ),
+
+            "reason": result.get(
+                "reason"
+            )
+        }
+
+
+        supabase_url = (
+            SUPABASE_URL.rstrip("/")
+            + "/rest/v1/scan_records"
+        )
+
+
+        supabase_data = json.dumps(
+            record
+        ).encode("utf-8")
+
+
+        supabase_request = urllib.request.Request(
+            supabase_url,
+            data=supabase_data,
+            method="POST"
+        )
+
+
+        supabase_request.add_header(
+            "Content-Type",
+            "application/json"
+        )
+
+        supabase_request.add_header(
+            "apikey",
+            SUPABASE_KEY
+        )
+
+        supabase_request.add_header(
+            "Authorization",
+            f"Bearer {SUPABASE_KEY}"
+        )
+
+        supabase_request.add_header(
+            "Prefer",
+            "return=minimal"
+        )
+
+
+        # ----------------------------------------------------
+        # Send record to Supabase
+        # ----------------------------------------------------
 
         try:
 
-            supabase.table("scan_records").insert({
+            with urllib.request.urlopen(
+                supabase_request,
+                timeout=15
+            ) as supabase_response:
 
-                "staff_id": staff_id,
+                status_code = supabase_response.status
 
-                "medication_name": result.get(
-                    "medication_name"
-                ),
-
-                "medication_strength": result.get(
-                    "medication_strength"
-                ),
-
-                "label_name": result.get(
-                    "label_name"
-                ),
-
-                "label_strength": result.get(
-                    "label_strength"
-                ),
-
-                "match": result.get(
-                    "match"
-                ),
-
-                "confidence": result.get(
-                    "confidence"
-                ),
-
-                "reason": result.get(
-                    "reason"
+                print(
+                    "Supabase insert status:",
+                    status_code
                 )
 
-            }).execute()
 
+        except urllib.error.HTTPError as db_error:
 
-        except Exception as db_error:
-
-            # Print the detailed error to Vercel logs
+            error_body = db_error.read().decode(
+                "utf-8",
+                errors="replace"
+            )
 
             print(
-                "Supabase database error type:",
-                type(db_error).__name__
-    )
+                "Supabase HTTP error:",
+                db_error.code
+            )
+
             print(
-                "Supabase database error:",
-                str(db_error)
+                "Supabase response:",
+                error_body
+            )
+
+            return jsonify({
+                "error": "Verification succeeded, but the audit record could not be saved."
+            }), 500
+
+
+        except urllib.error.URLError as db_error:
+
+            print(
+                "Supabase connection error:",
+                repr(db_error)
             )
 
             return jsonify({
@@ -272,7 +340,7 @@ Do not include any text outside the JSON object.
 
         print(
             "Verification error:",
-            str(e)
+            repr(e)
         )
 
         return jsonify({
