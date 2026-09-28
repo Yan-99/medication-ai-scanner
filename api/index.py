@@ -28,8 +28,8 @@ client = OpenAI(
 # SUPABASE CONFIGURATION
 # ============================================================
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "").strip()
 
 
 # ============================================================
@@ -259,11 +259,6 @@ Do not include any text outside the JSON object.
         supabase_request.add_header(
             "apikey",
             SUPABASE_KEY
-        )
-
-        supabase_request.add_header(
-            "Authorization",
-            f"Bearer {SUPABASE_KEY}"
         )
 
         supabase_request.add_header(
