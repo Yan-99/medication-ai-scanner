@@ -7,6 +7,7 @@
 
 ```
 <title>AI Medication Verification</title>
+```
 
 <style>
     * {
@@ -76,9 +77,8 @@
     }
 
     /*
-     * The camera is NOT mirrored by default.
-     * This is intentional because the rear camera should
-     * display the scene naturally.
+     * The camera is NOT mirrored.
+     * This is intentional because we use the rear camera.
      */
 
     /* Buttons */
@@ -122,12 +122,6 @@
     .verify-btn {
         background: #34a853;
         color: white;
-    }
-
-    /* Camera switch */
-
-    #switch-camera-btn {
-        display: none;
     }
 
     /* Preview */
@@ -217,7 +211,6 @@
         background: #0071e3;
     }
 </style>
-```
 
 </head>
 
@@ -232,7 +225,9 @@
     Capture the medication packaging and prescription label to verify that they match.
 </p>
 
+
 <!-- Step indicator -->
+
 <div class="step-indicator">
     <div id="indicator-1" class="indicator active"></div>
     <div id="indicator-2" class="indicator"></div>
@@ -258,19 +253,20 @@
     </div>
 
     <div id="camera-status">
-        Starting camera...
+        Camera is off.
     </div>
 
     <button
         id="capture-medication-btn"
-        class="primary-btn">
+        class="primary-btn"
+        disabled>
         📷 Capture Medication
     </button>
 
     <button
-        id="switch-camera-btn"
+        id="stop-camera-btn"
         class="secondary-btn">
-        🔄 Switch Camera
+        📷 Start Camera
     </button>
 
 </div>
@@ -294,10 +290,21 @@
         <video id="webcam-step-2" autoplay playsinline></video>
     </div>
 
+    <div id="camera-status-step-2">
+        Camera is off.
+    </div>
+
     <button
         id="capture-label-btn"
-        class="primary-btn">
+        class="primary-btn"
+        disabled>
         📷 Capture Prescription Label
+    </button>
+
+    <button
+        id="stop-camera-btn-step-2"
+        class="secondary-btn">
+        📷 Start Camera
     </button>
 
 </div>
@@ -307,7 +314,10 @@
      PREVIEWS
      ===================================================== -->
 
-<div id="medication-preview-container" class="preview-container" style="display:none;">
+<div
+    id="medication-preview-container"
+    class="preview-container"
+    style="display:none;">
 
     <h3>Medication Image</h3>
 
@@ -319,7 +329,10 @@
 </div>
 
 
-<div id="label-preview-container" class="preview-container" style="display:none;">
+<div
+    id="label-preview-container"
+    class="preview-container"
+    style="display:none;">
 
     <h3>Prescription Label Image</h3>
 
@@ -386,8 +399,11 @@
        VARIABLES
        ===================================================== */
 
-    const video = document.getElementById("webcam");
-    const videoStep2 = document.getElementById("webcam-step-2");
+    const video =
+        document.getElementById("webcam");
+
+    const videoStep2 =
+        document.getElementById("webcam-step-2");
 
     const captureMedicationBtn =
         document.getElementById("capture-medication-btn");
@@ -395,8 +411,11 @@
     const captureLabelBtn =
         document.getElementById("capture-label-btn");
 
-    const switchCameraBtn =
-        document.getElementById("switch-camera-btn");
+    const stopCameraBtn =
+        document.getElementById("stop-camera-btn");
+
+    const stopCameraBtnStep2 =
+        document.getElementById("stop-camera-btn-step-2");
 
     const verifyBtn =
         document.getElementById("verify-btn");
@@ -435,9 +454,9 @@
 
     let cameraStream = null;
 
-    let usingBackCamera = true;
-
     let currentStep = 1;
+
+    let cameraIsOn = false;
 
 
     /* =====================================================
@@ -447,21 +466,32 @@
     async function startCamera() {
 
         /*
-         * Stop the previous camera before starting another one.
-         * This is important when switching between front/rear cameras.
+         * If a camera is already running,
+         * stop it before starting a new one.
          */
 
-        stopCamera();
+        if (cameraStream) {
+            stopCamera();
+        }
 
-        cameraStatus.innerText = "Starting camera...";
+        cameraStatus.innerText =
+            "Starting camera...";
+
+        cameraStatus.className = "";
 
         try {
 
+            /*
+             * Rear camera is preferred.
+             */
+
             const constraints = {
+
                 video: {
-                    facingMode: usingBackCamera
-                        ? { ideal: "environment" }
-                        : { ideal: "user" },
+
+                    facingMode: {
+                        ideal: "environment"
+                    },
 
                     width: {
                         ideal: 1280
@@ -470,40 +500,70 @@
                     height: {
                         ideal: 720
                     }
+
                 },
 
                 audio: false
             };
 
+
             cameraStream =
-                await navigator.mediaDevices.getUserMedia(constraints);
+                await navigator.mediaDevices
+                    .getUserMedia(constraints);
+
 
             /*
-             * Both video elements use the same stream.
+             * Use the same camera stream
+             * for both steps.
              */
 
-            video.srcObject = cameraStream;
-            videoStep2.srcObject = cameraStream;
+            video.srcObject =
+                cameraStream;
 
-            cameraStatus.innerText =
-                usingBackCamera
-                    ? "Rear camera active"
-                    : "Front camera active";
+            videoStep2.srcObject =
+                cameraStream;
+
+
+            cameraIsOn = true;
+
 
             /*
-             * Check whether the device actually has multiple cameras.
+             * Update buttons.
              */
 
-            await checkAvailableCameras();
+            stopCameraBtn.innerText =
+                "⏹️ Stop Camera";
 
-        } catch (error) {
+            stopCameraBtnStep2.innerText =
+                "⏹️ Stop Camera";
 
-            console.error("Camera error:", error);
+
+            captureMedicationBtn.disabled =
+                false;
+
+            captureLabelBtn.disabled =
+                false;
+
 
             cameraStatus.innerText =
-                "Unable to access the selected camera.";
+                "Rear camera active";
 
-            cameraStatus.className = "error";
+        }
+
+        catch (error) {
+
+            console.error(
+                "Camera error:",
+                error
+            );
+
+            cameraIsOn = false;
+
+            cameraStatus.innerText =
+                "Unable to access the camera.";
+
+            cameraStatus.className =
+                "error";
 
         }
 
@@ -520,68 +580,99 @@
 
             cameraStream
                 .getTracks()
-                .forEach(track => track.stop());
+                .forEach(track => {
+                    track.stop();
+                });
 
             cameraStream = null;
         }
 
+
+        /*
+         * Disconnect the stream from the video elements.
+         */
+
+        video.srcObject = null;
+
+        videoStep2.srcObject = null;
+
+
+        cameraIsOn = false;
+
+
+        /*
+         * Update buttons.
+         */
+
+        stopCameraBtn.innerText =
+            "📷 Start Camera";
+
+        stopCameraBtnStep2.innerText =
+            "📷 Start Camera";
+
+
+        /*
+         * Prevent capturing while camera is off.
+         */
+
+        captureMedicationBtn.disabled =
+            true;
+
+        captureLabelBtn.disabled =
+            true;
+
+
+        cameraStatus.innerText =
+            "Camera is off.";
+
+        cameraStatus.className = "";
+
     }
 
 
     /* =====================================================
-       CHECK AVAILABLE CAMERAS
+       START / STOP CAMERA BUTTON
        ===================================================== */
 
-    async function checkAvailableCameras() {
+    stopCameraBtn.addEventListener(
+        "click",
+        async () => {
 
-        try {
+            if (cameraIsOn) {
 
-            const devices =
-                await navigator.mediaDevices.enumerateDevices();
-
-            const cameras =
-                devices.filter(
-                    device => device.kind === "videoinput"
-                );
-
-            /*
-             * Only show the switch button if there is
-             * more than one camera.
-             */
-
-            if (cameras.length > 1) {
-
-                switchCameraBtn.style.display = "block";
+                stopCamera();
 
             } else {
 
-                switchCameraBtn.style.display = "none";
+                await startCamera();
 
             }
 
-        } catch (error) {
+        }
+    );
 
-            console.error(
-                "Unable to enumerate cameras:",
-                error
-            );
+
+    /*
+     * The same camera control is available
+     * on Step 2.
+     */
+
+    stopCameraBtnStep2.addEventListener(
+        "click",
+        async () => {
+
+            if (cameraIsOn) {
+
+                stopCamera();
+
+            } else {
+
+                await startCamera();
+
+            }
 
         }
-
-    }
-
-
-    /* =====================================================
-       SWITCH CAMERA
-       ===================================================== */
-
-    switchCameraBtn.addEventListener("click", async () => {
-
-        usingBackCamera = !usingBackCamera;
-
-        await startCamera();
-
-    });
+    );
 
 
     /* =====================================================
@@ -589,10 +680,6 @@
        ===================================================== */
 
     function captureImage(videoElement) {
-
-        /*
-         * Make sure the video has loaded before capturing.
-         */
 
         if (
             !videoElement.videoWidth ||
@@ -609,6 +696,7 @@
 
         const canvas =
             document.createElement("canvas");
+
 
         canvas.width =
             videoElement.videoWidth;
@@ -631,8 +719,8 @@
 
 
         /*
-         * JPEG quality of 0.85 provides a good balance between
-         * image quality and request size.
+         * Convert the captured frame into
+         * a JPEG held temporarily in memory.
          */
 
         return canvas.toDataURL(
@@ -659,13 +747,12 @@
             }
 
 
-            medicationImage = image;
+            medicationImage =
+                image;
 
 
             /*
-             * Show a temporary preview.
-             *
-             * This is only held in browser memory.
+             * Display temporary preview.
              */
 
             medicationPreview.src =
@@ -681,22 +768,29 @@
 
             currentStep = 2;
 
+
             document
                 .getElementById("step-1")
-                .classList.remove("active");
+                .classList
+                .remove("active");
+
 
             document
                 .getElementById("step-2")
-                .classList.add("active");
+                .classList
+                .add("active");
 
 
             document
                 .getElementById("indicator-1")
-                .classList.add("active");
+                .classList
+                .add("active");
+
 
             document
                 .getElementById("indicator-2")
-                .classList.add("active");
+                .classList
+                .add("active");
 
         }
     );
@@ -718,11 +812,12 @@
             }
 
 
-            labelImage = image;
+            labelImage =
+                image;
 
 
             /*
-             * Show temporary preview.
+             * Display temporary preview.
              */
 
             labelPreview.src =
@@ -733,8 +828,8 @@
 
 
             /*
-             * Stop camera after both images have
-             * been captured.
+             * Both images have now been captured.
+             * Stop the camera automatically.
              */
 
             stopCamera();
@@ -746,7 +841,8 @@
 
             document
                 .getElementById("step-2")
-                .classList.remove("active");
+                .classList
+                .remove("active");
 
 
             /*
@@ -768,7 +864,10 @@
         "click",
         async () => {
 
-            if (!medicationImage || !labelImage) {
+            if (
+                !medicationImage ||
+                !labelImage
+            ) {
 
                 outputText.innerText =
                     "Both images are required before verification.";
@@ -783,14 +882,17 @@
             resultBox.style.display =
                 "block";
 
+
             outputText.className =
                 "loading";
+
 
             outputText.innerText =
                 "AI is analyzing the medication and prescription label...";
 
 
-            verifyBtn.disabled = true;
+            verifyBtn.disabled =
+                true;
 
 
             try {
@@ -823,7 +925,8 @@
                     await response.json();
 
 
-                outputText.className = "";
+                outputText.className =
+                    "";
 
 
                 if (data.result) {
@@ -831,7 +934,9 @@
                     outputText.innerText =
                         data.result;
 
-                } else if (data.error) {
+                }
+
+                else if (data.error) {
 
                     outputText.className =
                         "error";
@@ -839,14 +944,18 @@
                     outputText.innerText =
                         "Error: " + data.error;
 
-                } else {
+                }
+
+                else {
 
                     outputText.innerText =
                         "No verification result was returned.";
 
                 }
 
-            } catch (error) {
+            }
+
+            catch (error) {
 
                 console.error(
                     "Verification error:",
@@ -862,7 +971,8 @@
             }
 
 
-            verifyBtn.disabled = false;
+            verifyBtn.disabled =
+                false;
 
         }
     );
@@ -885,14 +995,14 @@
     function resetApp() {
 
         /*
-         * Stop camera first.
+         * Stop camera.
          */
 
         stopCamera();
 
 
         /*
-         * Remove references to captured images.
+         * Clear captured images from memory.
          */
 
         medicationImage = null;
@@ -900,7 +1010,7 @@
 
 
         /*
-         * Clear image previews.
+         * Clear previews.
          */
 
         medicationPreview.src = "";
@@ -915,11 +1025,14 @@
 
 
         /*
-         * Clear verification result.
+         * Clear result.
          */
 
-        outputText.innerText = "";
-        outputText.className = "";
+        outputText.innerText =
+            "";
+
+        outputText.className =
+            "";
 
         resultBox.style.display =
             "none";
@@ -942,13 +1055,17 @@
 
         currentStep = 1;
 
+
         document
             .getElementById("step-1")
-            .classList.add("active");
+            .classList
+            .add("active");
+
 
         document
             .getElementById("step-2")
-            .classList.remove("active");
+            .classList
+            .remove("active");
 
 
         /*
@@ -957,20 +1074,20 @@
 
         document
             .getElementById("indicator-1")
-            .classList.add("active");
+            .classList
+            .add("active");
+
 
         document
             .getElementById("indicator-2")
-            .classList.remove("active");
+            .classList
+            .remove("active");
 
 
         /*
-         * Restart the rear camera.
+         * Camera remains OFF after reset.
+         * User can press "Start Camera" when ready.
          */
-
-        usingBackCamera = true;
-
-        startCamera();
 
     }
 
@@ -984,7 +1101,7 @@
         () => {
 
             /*
-             * Stop the camera when leaving the page.
+             * Stop camera.
              */
 
             stopCamera();
@@ -992,8 +1109,6 @@
 
             /*
              * Remove image references.
-             *
-             * No localStorage/sessionStorage is used.
              */
 
             medicationImage = null;
@@ -1004,10 +1119,16 @@
 
 
     /* =====================================================
-       INITIALIZE
+       INITIAL STATE
        ===================================================== */
 
-    startCamera();
+    /*
+     * Camera intentionally does NOT start automatically.
+     *
+     * User must press "📷 Start Camera".
+     */
+
+    stopCamera();
 
 </script>
 
