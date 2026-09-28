@@ -1,5 +1,6 @@
 import os
 import json
+from supabase import create_client, Client
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
@@ -12,6 +13,15 @@ app = Flask(__name__, template_folder=template_dir)
 # Initialize OpenAI client
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+# Supabase
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
+supabase: Client = create_client(
+    SUPABASE_URL,
+    SUPABASE_KEY
+)
 
 
 @app.route("/")
