@@ -24,9 +24,9 @@ def verify_medication():
         return jsonify({'error': 'Both images are required'}), 400
 
     try:
-        # Split out the base64 data stream cleanly
-        med_image_data = data['medImage'].split(',')[1]
-        label_image_data = data['labelImage'].split(',')[1]
+        # FIXED: Extract index [1] to pull ONLY the raw base64 string, leaving out the data header prefix!
+        med_image_clean = data['medImage'].split(',')[1]
+        label_image_clean = data['labelImage'].split(',')[1]
     except IndexError:
         return jsonify({'error': 'Invalid image format received'}), 400
 
@@ -49,8 +49,8 @@ def verify_medication():
                     "role": "user",
                     "content": [
                         {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{med_image_data}"}},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{label_image_data}"}}
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{med_image_clean}"}},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{label_image_clean}"}}
                     ]
                 }
             ],
