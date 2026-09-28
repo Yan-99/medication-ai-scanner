@@ -1,8 +1,6 @@
 import os
 import json
-import urllib.request
-import urllib.error
-
+from supabase import create_client, Client
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
@@ -17,7 +15,7 @@ app = Flask(__name__, template_folder=template_dir)
 # OPENAI CONFIGURATION
 # ============================================================
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 
 client = OpenAI(
     api_key=OPENAI_API_KEY
@@ -30,6 +28,11 @@ client = OpenAI(
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "").strip()
+
+supabase: Client = create_client(
+    SUPABASE_URL,
+    SUPABASE_KEY
+)
 
 
 # ============================================================
@@ -190,6 +193,11 @@ Do not include any text outside the JSON object.
 
         except json.JSONDecodeError:
 
+            print(
+                "Invalid AI JSON response:",
+                raw_result
+            )
+
             return jsonify({
                 "error": "The AI returned an invalid response format.",
                 "raw_response": raw_result
@@ -233,85 +241,35 @@ Do not include any text outside the JSON object.
         }
 
 
-        supabase_url = (
-            SUPABASE_URL.rstrip("/")
-            + "/rest/v1/scan_records"
-        )
-
-
-        supabase_data = json.dumps(
-            record
-        ).encode("utf-8")
-
-
-        supabase_request = urllib.request.Request(
-            supabase_url,
-            data=supabase_data,
-            method="POST"
-        )
-
-
-        supabase_request.add_header(
-            "Content-Type",
-            "application/json"
-        )
-
-        supabase_request.add_header(
-            "apikey",
-            SUPABASE_KEY
-        )
-
-        supabase_request.add_header(
-            "Prefer",
-            "return=minimal"
-        )
-
-
         # ----------------------------------------------------
-        # Send record to Supabase
+        # Insert audit record
         # ----------------------------------------------------
 
         try:
 
-            with urllib.request.urlopen(
-                supabase_request,
-                timeout=15
-            ) as supabase_response:
-
-                status_code = supabase_response.status
-
-                print(
-                    "Supabase insert status:",
-                    status_code
-                )
+            supabase_response = (
+                supabase
+                .table("scan_records")
+                .insert(record)
+                .execute()
+            )
 
 
-        except urllib.error.HTTPError as db_error:
+            print(
+                "Supabase insert successful:",
+                supabase_response.data
+            )
 
-            error_body = db_error.read().decode(
-                "utf-8",
-                errors="replace"
+
+        except Exception as db_error:
+
+            print(
+                "Supabase database error type:",
+                type(db_error).__name__
             )
 
             print(
-                "Supabase HTTP error:",
-                db_error.code
-            )
-
-            print(
-                "Supabase response:",
-                error_body
-            )
-
-            return jsonify({
-                "error": "Verification succeeded, but the audit record could not be saved."
-            }), 500
-
-
-        except urllib.error.URLError as db_error:
-
-            print(
-                "Supabase connection error:",
+                "Supabase database error:",
                 repr(db_error)
             )
 
