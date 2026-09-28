@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +26,6 @@
             width: 100%;
             border-radius: 8px;
             background: #000;
-            transform: scaleX(-1);
         }
 
         button {
@@ -198,10 +196,11 @@
     let cameraStream = null;
 
     navigator.mediaDevices.getUserMedia({
-        video: {
-            width: 1280,
-            height: 720
-        }
+    video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+    }
     })
     .then(stream => {
         cameraStream = stream;
