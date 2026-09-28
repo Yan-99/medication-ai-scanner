@@ -3,7 +3,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
 
     <title>AI Medication Verification</title>
 
@@ -13,10 +17,16 @@
       }
 
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        max-width: 650px;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+
+        max-width: 850px;
         margin: 0 auto;
         padding: 20px;
+
         background: #f5f5f7;
         color: #1d1d1f;
       }
@@ -25,18 +35,61 @@
         background: white;
         padding: 25px;
         border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+
+        box-shadow:
+          0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      /* =====================================================
+         HEADER
+         ===================================================== */
+
+      .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+
+        margin-bottom: 20px;
+      }
+
+      .app-header-text {
+        flex: 1;
       }
 
       h1 {
         font-size: 26px;
-        margin-bottom: 8px;
+        margin: 0 0 8px 0;
       }
 
       .subtitle {
         color: #666;
-        margin-bottom: 20px;
+        margin: 0;
+        line-height: 1.5;
       }
+
+      /* =====================================================
+         TOP NAVIGATION
+         ===================================================== */
+
+      .top-navigation {
+        flex-shrink: 0;
+      }
+
+      .history-nav-btn {
+        width: auto;
+        margin-top: 0;
+        padding: 10px 14px;
+
+        background: #e8e8ed;
+        color: #1d1d1f;
+
+        white-space: nowrap;
+      }
+
+      /* =====================================================
+         STEPS
+         ===================================================== */
 
       .step {
         display: none;
@@ -55,62 +108,82 @@
       .step-description {
         color: #666;
         margin-bottom: 15px;
+        line-height: 1.5;
       }
 
-      /* Camera */
+      /* =====================================================
+         STEP INDICATOR
+         ===================================================== */
 
-      .camera-container {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        border-radius: 12px;
-        background: #000;
+      .step-indicator {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 25px;
       }
 
-      video {
-        width: 100%;
-        display: block;
-        border-radius: 12px;
-        background: #000;
+      .indicator {
+        flex: 1;
+        height: 5px;
+        border-radius: 5px;
+        background: #ddd;
       }
 
-      /*
-     * The camera is NOT mirrored.
-     * This is intentional because we use the rear camera.
-     */
+      .indicator.active {
+        background: #0071e3;
+      }
 
-      /* Staff ID */
+      /* =====================================================
+         STAFF ID
+         ===================================================== */
+
       #staff-id-screen label {
         display: block;
         font-weight: 600;
         margin-bottom: 8px;
       }
+
       #staff-id {
         width: 100%;
         padding: 14px;
+
         border: 1px solid #ccc;
         border-radius: 10px;
+
         font-size: 16px;
+
         margin-bottom: 5px;
+
         outline: none;
       }
+
       #staff-id:focus {
         border-color: #0071e3;
-        box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
+
+        box-shadow:
+          0 0 0 2px rgba(0, 113, 227, 0.15);
       }
 
-      /* Buttons */
+      /* =====================================================
+         BUTTONS
+         ===================================================== */
 
       button {
         width: 100%;
+
         border: none;
         border-radius: 10px;
+
         padding: 14px 18px;
         margin-top: 12px;
+
         font-size: 16px;
         font-weight: 600;
+
         cursor: pointer;
-        transition: opacity 0.2s;
+
+        transition:
+          opacity 0.2s,
+          background 0.2s;
       }
 
       button:hover {
@@ -142,7 +215,51 @@
         color: white;
       }
 
-      /* Preview */
+      /* =====================================================
+         CAMERA
+         ===================================================== */
+
+      .camera-container {
+        position: relative;
+
+        width: 100%;
+
+        overflow: hidden;
+
+        border-radius: 12px;
+
+        background: #000;
+      }
+
+      video {
+        width: 100%;
+
+        display: block;
+
+        border-radius: 12px;
+
+        background: #000;
+      }
+
+      /*
+       * The camera is NOT mirrored.
+       * This is intentional because we use the rear camera.
+       */
+
+      #camera-status,
+      #camera-status-step-2 {
+        margin-top: 10px;
+
+        font-size: 14px;
+
+        color: #666;
+
+        text-align: center;
+      }
+
+      /* =====================================================
+         PREVIEWS
+         ===================================================== */
 
       .preview-container {
         margin-top: 20px;
@@ -150,24 +267,35 @@
 
       .preview-container h3 {
         font-size: 16px;
+
         margin-bottom: 10px;
       }
 
       .preview {
         width: 100%;
+
         border-radius: 10px;
+
         display: block;
+
         background: #f2f2f2;
       }
 
-      /* Result */
+      /* =====================================================
+         RESULT
+         ===================================================== */
 
       #result-box {
         display: none;
+
         margin-top: 25px;
+
         padding: 18px;
+
         border-radius: 12px;
+
         background: #f0f0f5;
+
         text-align: left;
       }
 
@@ -177,11 +305,13 @@
 
       #output-text {
         white-space: pre-line;
+
         line-height: 1.5;
       }
 
       .loading {
         color: #666;
+
         font-style: italic;
       }
 
@@ -189,353 +319,1129 @@
         color: #c00;
       }
 
-      /* Status */
-
-      #camera-status {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #666;
-        text-align: center;
-      }
-
-      /* Privacy note */
+      /* =====================================================
+         PRIVACY
+         ===================================================== */
 
       .privacy-note {
         margin-top: 20px;
+
         padding: 12px;
+
         background: #f7f7f7;
+
         border-radius: 8px;
+
         font-size: 13px;
+
         color: #666;
+
         line-height: 1.4;
       }
 
-      /* Step indicator */
+      /* =====================================================
+         SCAN HISTORY
+         ===================================================== */
 
-      .step-indicator {
+      #scan-history-screen {
+        display: none;
+      }
+
+      #scan-history-screen.active {
+        display: block;
+      }
+
+      .history-header {
         display: flex;
-        gap: 8px;
+
+        justify-content: space-between;
+
+        align-items: flex-start;
+
+        gap: 20px;
+
         margin-bottom: 25px;
       }
 
-      .indicator {
-        flex: 1;
-        height: 5px;
-        border-radius: 5px;
-        background: #ddd;
+      .history-header h2 {
+        margin: 0 0 6px 0;
+
+        font-size: 24px;
       }
 
-      .indicator.active {
-        background: #0071e3;
+      .history-description {
+        margin: 0;
+
+        color: #666;
+
+        line-height: 1.5;
+      }
+
+      .history-back-btn {
+        width: auto;
+
+        margin-top: 0;
+
+        white-space: nowrap;
+      }
+
+      /* =====================================================
+         HISTORY FILTERS
+         ===================================================== */
+
+      .history-filters {
+        display: flex;
+
+        gap: 15px;
+
+        margin-bottom: 20px;
+      }
+
+      .history-search,
+      .history-result-filter {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 6px;
+      }
+
+      .history-search {
+        flex: 1;
+      }
+
+      .history-filters label {
+        font-size: 13px;
+
+        font-weight: 600;
+      }
+
+      .history-filters input,
+      .history-filters select {
+        width: 100%;
+
+        padding: 10px 12px;
+
+        border: 1px solid #ccc;
+
+        border-radius: 8px;
+
+        font-size: 14px;
+
+        background: white;
+
+        outline: none;
+      }
+
+      .history-filters input:focus,
+      .history-filters select:focus {
+        border-color: #0071e3;
+
+        box-shadow:
+          0 0 0 2px rgba(0, 113, 227, 0.1);
+      }
+
+      /* =====================================================
+         HISTORY TABLE
+         ===================================================== */
+
+      .history-table-container {
+        width: 100%;
+
+        overflow-x: auto;
+
+        border: 1px solid #e0e0e0;
+
+        border-radius: 10px;
+      }
+
+      #history-table {
+        width: 100%;
+
+        border-collapse: collapse;
+
+        min-width: 850px;
+      }
+
+      #history-table th {
+        text-align: left;
+
+        padding: 12px;
+
+        background: #f5f5f5;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        border-bottom: 1px solid #ddd;
+
+        white-space: nowrap;
+      }
+
+      #history-table td {
+        padding: 12px;
+
+        border-bottom: 1px solid #eee;
+
+        font-size: 14px;
+
+        vertical-align: middle;
+      }
+
+      #history-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      #history-table tbody tr:hover {
+        background: #fafafa;
+      }
+
+      /* =====================================================
+         RESULT BADGES
+         ===================================================== */
+
+      .result-badge {
+        display: inline-block;
+
+        padding: 5px 9px;
+
+        border-radius: 6px;
+
+        font-size: 12px;
+
+        font-weight: 600;
+
+        white-space: nowrap;
+      }
+
+      .result-match {
+        background: #e8f5e9;
+
+        color: #2e7d32;
+      }
+
+      .result-no-match {
+        background: #ffebee;
+
+        color: #c62828;
+      }
+
+      /* =====================================================
+         CONFIDENCE
+         ===================================================== */
+
+      .confidence-text {
+        text-transform: capitalize;
+      }
+
+      /* =====================================================
+         DETAILS BUTTON
+         ===================================================== */
+
+      .details-btn {
+        width: auto;
+
+        margin: 0;
+
+        padding: 7px 10px;
+
+        background: #e8e8ed;
+
+        color: #1d1d1f;
+
+        font-size: 13px;
+
+        font-weight: 500;
+      }
+
+      /* =====================================================
+         HISTORY MESSAGES
+         ===================================================== */
+
+      .history-message {
+        padding: 25px;
+
+        text-align: center;
+
+        color: #666;
+      }
+
+      .history-message.error {
+        color: #c00;
+      }
+
+      /* =====================================================
+         HISTORY DETAILS
+         ===================================================== */
+
+      #history-detail-box {
+        display: none;
+
+        margin-top: 20px;
+
+        padding: 18px;
+
+        border-radius: 12px;
+
+        background: #f0f0f5;
+
+        border: 1px solid #e0e0e0;
+      }
+
+      #history-detail-box h3 {
+        margin-top: 0;
+
+        margin-bottom: 15px;
+      }
+
+      .detail-row {
+        display: flex;
+
+        gap: 10px;
+
+        padding: 8px 0;
+
+        border-bottom: 1px solid #ddd;
+
+        line-height: 1.5;
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        min-width: 150px;
+
+        font-weight: 600;
+      }
+
+      .detail-value {
+        flex: 1;
+      }
+
+      .close-detail-btn {
+        width: auto;
+
+        padding: 9px 14px;
+
+        margin-top: 15px;
+      }
+
+      /* =====================================================
+         MOBILE
+         ===================================================== */
+
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+
+        .container {
+          padding: 18px;
+
+          border-radius: 12px;
+        }
+
+        .app-header {
+          flex-direction: column;
+        }
+
+        .top-navigation {
+          width: 100%;
+        }
+
+        .history-nav-btn {
+          width: 100%;
+        }
+
+        .history-header {
+          flex-direction: column;
+        }
+
+        .history-back-btn {
+          width: 100%;
+        }
+
+        .history-filters {
+          flex-direction: column;
+        }
+
+        .detail-row {
+          flex-direction: column;
+
+          gap: 2px;
+        }
+
+        .detail-label {
+          min-width: auto;
+        }
       }
     </style>
   </head>
 
   <body>
     <div class="container">
-      <h1>Medication Verification</h1>
 
-      <p class="subtitle">
-        Capture the medication packaging and prescription label to verify that
-        they match.
-      </p>
+      <!-- =====================================================
+           APPLICATION HEADER
+           ===================================================== -->
 
-      <!-- Step indicator -->
+      <div class="app-header">
 
-      <div class="step-indicator">
-        <div id="indicator-1" class="indicator active"></div>
-        <div id="indicator-2" class="indicator"></div>
-      </div>
+        <div class="app-header-text">
 
-      <!-- ===================================================== STAFF ID SCREEN ===================================================== -->
-      <div id="staff-id-screen" class="step active">
-        <div class="step-title">Staff Identification</div>
+          <h1>AI Medication Verification</h1>
 
-        <div class="step-description">
-          Please enter your Staff ID before starting medication verification.
+          <p class="subtitle">
+            Capture the medication packaging and prescription label
+            to verify that they match.
+          </p>
+
         </div>
 
-        <label for="staff-id"> Staff ID </label>
+        <div class="top-navigation">
 
-        <input
-          type="text"
-          id="staff-id"
-          placeholder="Enter your Staff ID"
-          autocomplete="off"
-          maxlength="30"
-        />
+          <button
+            id="show-history-btn"
+            class="secondary-btn history-nav-btn"
+          >
+            📋 Scan History
+          </button>
 
-        <button id="start-verification-btn" class="primary-btn">
-          Start Verification
-        </button>
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           VERIFICATION INTERFACE
+           ===================================================== -->
+
+      <div id="verification-interface">
+
+        <!-- Step indicator -->
+
+        <div class="step-indicator">
+
+          <div
+            id="indicator-1"
+            class="indicator active"
+          ></div>
+
+          <div
+            id="indicator-2"
+            class="indicator"
+          ></div>
+
+        </div>
+
+
+        <!-- ===================================================
+             STAFF ID SCREEN
+             =================================================== -->
 
         <div
-          id="staff-id-error"
-          class="error"
-          style="display: none; margin-top: 10px"
+          id="staff-id-screen"
+          class="step active"
         >
-          Please enter your Staff ID.
+
+          <div class="step-title">
+            Staff Identification
+          </div>
+
+          <div class="step-description">
+            Please enter your Staff ID before starting
+            medication verification.
+          </div>
+
+          <label for="staff-id">
+            Staff ID
+          </label>
+
+          <input
+            type="text"
+            id="staff-id"
+            placeholder="Enter your Staff ID"
+            autocomplete="off"
+            maxlength="30"
+          />
+
+          <button
+            id="start-verification-btn"
+            class="primary-btn"
+          >
+            Start Verification
+          </button>
+
+          <div
+            id="staff-id-error"
+            class="error"
+            style="display: none; margin-top: 10px"
+          >
+            Please enter your Staff ID.
+          </div>
+
         </div>
+
+
+        <!-- ===================================================
+             STEP 1 — MEDICATION
+             =================================================== -->
+
+        <div
+          id="step-1"
+          class="step"
+        >
+
+          <div class="step-title">
+            Step 1: Capture Medication
+          </div>
+
+          <div class="step-description">
+            Position the medication box or bottle clearly
+            inside the camera view.
+          </div>
+
+          <div class="camera-container">
+
+            <video
+              id="webcam"
+              autoplay
+              playsinline
+            ></video>
+
+          </div>
+
+          <div id="camera-status">
+            Camera is off.
+          </div>
+
+          <button
+            id="capture-medication-btn"
+            class="primary-btn"
+            disabled
+          >
+            📷 Capture Medication
+          </button>
+
+          <button
+            id="stop-camera-btn"
+            class="secondary-btn"
+          >
+            📷 Start Camera
+          </button>
+
+        </div>
+
+
+        <!-- ===================================================
+             STEP 2 — LABEL
+             =================================================== -->
+
+        <div
+          id="step-2"
+          class="step"
+        >
+
+          <div class="step-title">
+            Step 2: Capture Prescription Label
+          </div>
+
+          <div class="step-description">
+            Position the prescription or cartfill label
+            clearly inside the camera view.
+          </div>
+
+          <div class="camera-container">
+
+            <video
+              id="webcam-step-2"
+              autoplay
+              playsinline
+            ></video>
+
+          </div>
+
+          <div id="camera-status-step-2">
+            Camera is off.
+          </div>
+
+          <button
+            id="capture-label-btn"
+            class="primary-btn"
+            disabled
+          >
+            📷 Capture Prescription Label
+          </button>
+
+          <button
+            id="stop-camera-btn-step-2"
+            class="secondary-btn"
+          >
+            📷 Start Camera
+          </button>
+
+        </div>
+
+
+        <!-- ===================================================
+             PREVIEWS
+             =================================================== -->
+
+        <div
+          id="medication-preview-container"
+          class="preview-container"
+          style="display: none"
+        >
+
+          <h3>
+            Medication Image
+          </h3>
+
+          <img
+            id="medication-preview"
+            class="preview"
+            alt="Captured medication"
+          />
+
+        </div>
+
+
+        <div
+          id="label-preview-container"
+          class="preview-container"
+          style="display: none"
+        >
+
+          <h3>
+            Prescription Label Image
+          </h3>
+
+          <img
+            id="label-preview"
+            class="preview"
+            alt="Captured prescription label"
+          />
+
+        </div>
+
+
+        <!-- ===================================================
+             VERIFY
+             =================================================== -->
+
+        <button
+          id="verify-btn"
+          class="verify-btn"
+          style="display: none"
+        >
+          🔍 Scan & Verify Match
+        </button>
+
+
+        <!-- ===================================================
+             RESET
+             =================================================== -->
+
+        <button
+          id="reset-btn"
+          class="reset-btn"
+        >
+          ↻ Start New Verification
+        </button>
+
+
+        <!-- ===================================================
+             RESULT
+             =================================================== -->
+
+        <div id="result-box">
+
+          <h3>
+            Verification Result
+          </h3>
+
+          <p id="output-text"></p>
+
+        </div>
+
       </div>
 
-      <!-- =====================================================
-     STEP 1 — MEDICATION
-     ===================================================== -->
-
-      <div id="step-1" class="step">
-        <div class="step-title">Step 1: Capture Medication</div>
-
-        <div class="step-description">
-          Position the medication box or bottle clearly inside the camera view.
-        </div>
-
-        <div class="camera-container">
-          <video id="webcam" autoplay playsinline></video>
-        </div>
-
-        <div id="camera-status">Camera is off.</div>
-
-        <button id="capture-medication-btn" class="primary-btn" disabled>
-          📷 Capture Medication
-        </button>
-
-        <button id="stop-camera-btn" class="secondary-btn">
-          📷 Start Camera
-        </button>
-      </div>
 
       <!-- =====================================================
-     STEP 2 — LABEL
-     ===================================================== -->
-
-      <div id="step-2" class="step">
-        <div class="step-title">Step 2: Capture Prescription Label</div>
-
-        <div class="step-description">
-          Position the prescription or cartfill label clearly inside the camera
-          view.
-        </div>
-
-        <div class="camera-container">
-          <video id="webcam-step-2" autoplay playsinline></video>
-        </div>
-
-        <div id="camera-status-step-2">Camera is off.</div>
-
-        <button id="capture-label-btn" class="primary-btn" disabled>
-          📷 Capture Prescription Label
-        </button>
-
-        <button id="stop-camera-btn-step-2" class="secondary-btn">
-          📷 Start Camera
-        </button>
-      </div>
-
-      <!-- =====================================================
-     PREVIEWS
-     ===================================================== -->
+           SCAN HISTORY
+           ===================================================== -->
 
       <div
-        id="medication-preview-container"
-        class="preview-container"
-        style="display: none"
+        id="scan-history-screen"
       >
-        <h3>Medication Image</h3>
 
-        <img
-          id="medication-preview"
-          class="preview"
-          alt="Captured medication"
-        />
+        <div class="history-header">
+
+          <div>
+
+            <h2>
+              Scan History
+            </h2>
+
+            <p class="history-description">
+              View previous medication verification records.
+            </p>
+
+          </div>
+
+          <button
+            id="back-to-verification-btn"
+            class="secondary-btn history-back-btn"
+          >
+            ← New Verification
+          </button>
+
+        </div>
+
+
+        <!-- ===================================================
+             FILTERS
+             =================================================== -->
+
+        <div class="history-filters">
+
+          <div class="history-search">
+
+            <label for="history-search">
+              Search
+            </label>
+
+            <input
+              type="text"
+              id="history-search"
+              placeholder="Search Staff ID or medication"
+              autocomplete="off"
+            />
+
+          </div>
+
+
+          <div class="history-result-filter">
+
+            <label for="history-result-filter">
+              Result
+            </label>
+
+            <select
+              id="history-result-filter"
+            >
+
+              <option value="all">
+                All
+              </option>
+
+              <option value="match">
+                MATCH
+              </option>
+
+              <option value="no-match">
+                DO NOT MATCH
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===================================================
+             LOADING
+             =================================================== -->
+
+        <div
+          id="history-loading"
+          class="history-message"
+          style="display: none"
+        >
+          Loading scan history...
+        </div>
+
+
+        <!-- ===================================================
+             ERROR
+             =================================================== -->
+
+        <div
+          id="history-error"
+          class="history-message error"
+          style="display: none"
+        ></div>
+
+
+        <!-- ===================================================
+             TABLE
+             =================================================== -->
+
+        <div class="history-table-container">
+
+          <table id="history-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Date / Time
+                </th>
+
+                <th>
+                  Staff ID
+                </th>
+
+                <th>
+                  Medication
+                </th>
+
+                <th>
+                  Label
+                </th>
+
+                <th>
+                  Result
+                </th>
+
+                <th>
+                  Confidence
+                </th>
+
+                <th>
+                  Details
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody
+              id="history-table-body"
+            ></tbody>
+
+          </table>
+
+        </div>
+
+
+        <!-- ===================================================
+             EMPTY STATE
+             =================================================== -->
+
+        <div
+          id="history-empty"
+          class="history-message"
+          style="display: none"
+        >
+          No scan records found.
+        </div>
+
+
+        <!-- ===================================================
+             HISTORY DETAILS
+             =================================================== -->
+
+        <div id="history-detail-box">
+
+          <h3>
+            Verification Details
+          </h3>
+
+          <div
+            id="history-detail-content"
+          ></div>
+
+          <button
+            id="close-detail-btn"
+            class="secondary-btn close-detail-btn"
+          >
+            Close Details
+          </button>
+
+        </div>
+
       </div>
 
-      <div
-        id="label-preview-container"
-        class="preview-container"
-        style="display: none"
-      >
-        <h3>Prescription Label Image</h3>
-
-        <img
-          id="label-preview"
-          class="preview"
-          alt="Captured prescription label"
-        />
-      </div>
 
       <!-- =====================================================
-     VERIFY
-     ===================================================== -->
-
-      <button id="verify-btn" class="verify-btn" style="display: none">
-        🔍 Scan & Verify Match
-      </button>
-
-      <!-- =====================================================
-     RESET
-     ===================================================== -->
-
-      <button id="reset-btn" class="reset-btn">↻ Start New Verification</button>
-
-      <!-- =====================================================
-     RESULT
-     ===================================================== -->
-
-      <div id="result-box">
-        <h3>Verification Result</h3>
-
-        <p id="output-text"></p>
-      </div>
-
-      <!-- =====================================================
-     PRIVACY
-     ===================================================== -->
+           PRIVACY
+           ===================================================== -->
 
       <div class="privacy-note">
-        Images are kept only temporarily in this webpage while verification is
-        being performed. This page does not save captured images to
-        localStorage, sessionStorage, or downloadable files.
+
+        Captured images are held temporarily in this webpage
+        while verification is being performed and are sent to
+        the verification service for analysis. This webpage does
+        not save captured images to localStorage, sessionStorage,
+        or downloadable files.
+
       </div>
+
     </div>
 
-    <script>
-      /* =====================================================
-       VARIABLES
-       ===================================================== */
 
-      const staffIdScreen = document.getElementById("staff-id-screen");
-      const staffIdInput = document.getElementById("staff-id");
-      const startVerificationBtn = document.getElementById(
-        "start-verification-btn"
-      );
-      const staffIdError = document.getElementById("staff-id-error");
+    <script>
+
+      /* =====================================================
+         VARIABLES
+         ===================================================== */
+
+      const staffIdScreen =
+        document.getElementById(
+          "staff-id-screen"
+        );
+
+      const staffIdInput =
+        document.getElementById(
+          "staff-id"
+        );
+
+      const startVerificationBtn =
+        document.getElementById(
+          "start-verification-btn"
+        );
+
+      const staffIdError =
+        document.getElementById(
+          "staff-id-error"
+        );
+
+      const verificationInterface =
+        document.getElementById(
+          "verification-interface"
+        );
+
+      const showHistoryBtn =
+        document.getElementById(
+          "show-history-btn"
+        );
+
+      const scanHistoryScreen =
+        document.getElementById(
+          "scan-history-screen"
+        );
+
+      const backToVerificationBtn =
+        document.getElementById(
+          "back-to-verification-btn"
+        );
+
       let staffId = null;
 
+
       /* =====================================================
-       STAFF ID EVENT LISTENER
-       ===================================================== */
+         STAFF ID EVENT LISTENER
+         ===================================================== */
 
-      startVerificationBtn.addEventListener("click", () => {
-        const enteredStaffId = staffIdInput.value.trim();
+      startVerificationBtn.addEventListener(
+        "click",
+        () => {
 
-        if (!enteredStaffId) {
-          staffIdError.style.display = "block";
+          const enteredStaffId =
+            staffIdInput.value.trim();
 
-          return;
+
+          if (!enteredStaffId) {
+
+            staffIdError.style.display =
+              "block";
+
+            return;
+          }
+
+
+          staffId =
+            enteredStaffId;
+
+
+          staffIdError.style.display =
+            "none";
+
+
+          /*
+           * Hide Staff ID screen.
+           */
+
+          staffIdScreen.classList.remove(
+            "active"
+          );
+
+
+          /*
+           * Show Step 1.
+           */
+
+          document
+            .getElementById("step-1")
+            .classList.add("active");
+
+
+          /*
+           * Camera stays OFF.
+           */
+
+          stopCamera();
+
         }
+      );
 
-        staffId = enteredStaffId;
-
-        staffIdError.style.display = "none";
-
-        /*
-         * Hide Staff ID screen
-         */
-
-        staffIdScreen.classList.remove("active");
-
-        /*
-         * Show Step 1
-         */
-
-        document.getElementById("step-1").classList.add("active");
-
-        /*
-         * Camera stays OFF.
-         * Staff presses Start Camera manually.
-         */
-
-        stopCamera();
-      });
 
       /* =====================================================
-       ENTER KEY SUPPORT
-       ===================================================== */
+         ENTER KEY SUPPORT
+         ===================================================== */
 
-      staffIdInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          startVerificationBtn.click();
+      staffIdInput.addEventListener(
+        "keydown",
+        (event) => {
+
+          if (event.key === "Enter") {
+
+            startVerificationBtn.click();
+
+          }
+
         }
-      });
-
-      const video = document.getElementById("webcam");
-
-      const videoStep2 = document.getElementById("webcam-step-2");
-
-      const captureMedicationBtn = document.getElementById(
-        "capture-medication-btn"
       );
 
-      const captureLabelBtn = document.getElementById("capture-label-btn");
-
-      const stopCameraBtn = document.getElementById("stop-camera-btn");
-
-      const stopCameraBtnStep2 = document.getElementById(
-        "stop-camera-btn-step-2"
-      );
-
-      const cameraStatusStep2 = document.getElementById("camera-status-step-2");
-
-      const verifyBtn = document.getElementById("verify-btn");
-
-      const resetBtn = document.getElementById("reset-btn");
-
-      const resultBox = document.getElementById("result-box");
-
-      const outputText = document.getElementById("output-text");
-
-      const cameraStatus = document.getElementById("camera-status");
-
-      const medicationPreview = document.getElementById("medication-preview");
-
-      const labelPreview = document.getElementById("label-preview");
-
-      const medicationPreviewContainer = document.getElementById(
-        "medication-preview-container"
-      );
-
-      const labelPreviewContainer = document.getElementById(
-        "label-preview-container"
-      );
 
       /* =====================================================
-       APP STATE
-       ===================================================== */
+         CAMERA VARIABLES
+         ===================================================== */
+
+      const video =
+        document.getElementById(
+          "webcam"
+        );
+
+      const videoStep2 =
+        document.getElementById(
+          "webcam-step-2"
+        );
+
+      const captureMedicationBtn =
+        document.getElementById(
+          "capture-medication-btn"
+        );
+
+      const captureLabelBtn =
+        document.getElementById(
+          "capture-label-btn"
+        );
+
+      const stopCameraBtn =
+        document.getElementById(
+          "stop-camera-btn"
+        );
+
+      const stopCameraBtnStep2 =
+        document.getElementById(
+          "stop-camera-btn-step-2"
+        );
+
+      const cameraStatusStep2 =
+        document.getElementById(
+          "camera-status-step-2"
+        );
+
+      const verifyBtn =
+        document.getElementById(
+          "verify-btn"
+        );
+
+      const resetBtn =
+        document.getElementById(
+          "reset-btn"
+        );
+
+      const resultBox =
+        document.getElementById(
+          "result-box"
+        );
+
+      const outputText =
+        document.getElementById(
+          "output-text"
+        );
+
+      const cameraStatus =
+        document.getElementById(
+          "camera-status"
+        );
+
+      const medicationPreview =
+        document.getElementById(
+          "medication-preview"
+        );
+
+      const labelPreview =
+        document.getElementById(
+          "label-preview"
+        );
+
+      const medicationPreviewContainer =
+        document.getElementById(
+          "medication-preview-container"
+        );
+
+      const labelPreviewContainer =
+        document.getElementById(
+          "label-preview-container"
+        );
+
+
+      /* =====================================================
+         APP STATE
+         ===================================================== */
 
       let medicationImage = null;
+
       let labelImage = null;
 
       let cameraStream = null;
 
-      let currentStep = 1;
-
       let cameraIsOn = false;
 
+
       /* =====================================================
-       START CAMERA
-       ===================================================== */
+         START CAMERA
+         ===================================================== */
 
       async function startCamera() {
+
         /*
          * If a camera is already running,
          * stop it before starting a new one.
          */
 
         if (cameraStream) {
+
           stopCamera();
+
         }
 
-        cameraStatus.innerText = "Starting camera...";
+
+        cameraStatus.innerText =
+          "Starting camera...";
 
         cameraStatus.className = "";
 
+
         try {
+
           /*
-           * Rear camera is preferred.
+           * Prefer the rear camera.
            */
 
           const constraints = {
+
             video: {
+
               facingMode: {
                 ideal: "environment",
               },
@@ -547,407 +1453,1488 @@
               height: {
                 ideal: 720,
               },
+
             },
 
             audio: false,
+
           };
 
-          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+          cameraStream =
+            await navigator
+              .mediaDevices
+              .getUserMedia(
+                constraints
+              );
+
 
           /*
            * Use the same camera stream
            * for both steps.
            */
 
-          video.srcObject = cameraStream;
+          video.srcObject =
+            cameraStream;
 
-          videoStep2.srcObject = cameraStream;
+          videoStep2.srcObject =
+            cameraStream;
+
 
           cameraIsOn = true;
+
 
           /*
            * Update buttons.
            */
 
-          stopCameraBtn.innerText = "⏹️ Stop Camera";
+          stopCameraBtn.innerText =
+            "⏹️ Stop Camera";
 
-          stopCameraBtnStep2.innerText = "⏹️ Stop Camera";
+          stopCameraBtnStep2.innerText =
+            "⏹️ Stop Camera";
 
-          captureMedicationBtn.disabled = false;
 
-          captureLabelBtn.disabled = false;
+          captureMedicationBtn.disabled =
+            false;
 
-          cameraStatus.innerText = "Rear camera active";
+          captureLabelBtn.disabled =
+            false;
 
-          cameraStatusStep2.innerText = "Rear camera active";
+
+          cameraStatus.innerText =
+            "Rear camera active";
+
+          cameraStatusStep2.innerText =
+            "Rear camera active";
+
+
         } catch (error) {
-          console.error("Camera error:", error);
+
+          console.error(
+            "Camera error:",
+            error
+          );
+
 
           cameraIsOn = false;
 
-          cameraStatus.innerText = "Unable to access the camera.";
 
-          cameraStatus.className = "error";
+          cameraStatus.innerText =
+            "Unable to access the camera.";
+
+          cameraStatus.className =
+            "error";
+
         }
+
       }
 
+
       /* =====================================================
-       STOP CAMERA
-       ===================================================== */
+         STOP CAMERA
+         ===================================================== */
 
       function stopCamera() {
+
         if (cameraStream) {
-          cameraStream.getTracks().forEach((track) => {
-            track.stop();
-          });
+
+          cameraStream
+            .getTracks()
+            .forEach(
+              (track) => {
+                track.stop();
+              }
+            );
 
           cameraStream = null;
+
         }
 
+
         /*
-         * Disconnect the stream from the video elements.
+         * Disconnect the stream.
          */
 
         video.srcObject = null;
 
         videoStep2.srcObject = null;
 
+
         cameraIsOn = false;
+
 
         /*
          * Update buttons.
          */
 
-        stopCameraBtn.innerText = "📷 Start Camera";
+        stopCameraBtn.innerText =
+          "📷 Start Camera";
 
-        stopCameraBtnStep2.innerText = "📷 Start Camera";
+        stopCameraBtnStep2.innerText =
+          "📷 Start Camera";
+
 
         /*
-         * Prevent capturing while camera is off.
+         * Prevent capturing.
          */
 
-        captureMedicationBtn.disabled = true;
+        captureMedicationBtn.disabled =
+          true;
 
-        captureLabelBtn.disabled = true;
+        captureLabelBtn.disabled =
+          true;
 
-        cameraStatus.innerText = "Camera is off.";
 
-        cameraStatusStep2.innerText = "Camera is off.";
+        cameraStatus.innerText =
+          "Camera is off.";
+
+        cameraStatusStep2.innerText =
+          "Camera is off.";
 
         cameraStatus.className = "";
+
       }
 
-      /* =====================================================
-       START / STOP CAMERA BUTTON
-       ===================================================== */
-
-      stopCameraBtn.addEventListener("click", async () => {
-        if (cameraIsOn) {
-          stopCamera();
-        } else {
-          await startCamera();
-        }
-      });
-
-      /*
-       * The same camera control is available
-       * on Step 2.
-       */
-
-      stopCameraBtnStep2.addEventListener("click", async () => {
-        if (cameraIsOn) {
-          stopCamera();
-        } else {
-          await startCamera();
-        }
-      });
 
       /* =====================================================
-       CAPTURE IMAGE
-       ===================================================== */
+         START / STOP CAMERA BUTTON
+         ===================================================== */
 
-      function captureImage(videoElement) {
-        if (!videoElement.videoWidth || !videoElement.videoHeight) {
-          alert("Camera is not ready yet. Please wait a moment and try again.");
+      stopCameraBtn.addEventListener(
+        "click",
+        async () => {
+
+          if (cameraIsOn) {
+
+            stopCamera();
+
+          } else {
+
+            await startCamera();
+
+          }
+
+        }
+      );
+
+
+      stopCameraBtnStep2.addEventListener(
+        "click",
+        async () => {
+
+          if (cameraIsOn) {
+
+            stopCamera();
+
+          } else {
+
+            await startCamera();
+
+          }
+
+        }
+      );
+
+
+      /* =====================================================
+         CAPTURE IMAGE
+         ===================================================== */
+
+      function captureImage(
+        videoElement
+      ) {
+
+        if (
+          !videoElement.videoWidth ||
+          !videoElement.videoHeight
+        ) {
+
+          alert(
+            "Camera is not ready yet. Please wait a moment and try again."
+          );
 
           return null;
+
         }
 
-        const canvas = document.createElement("canvas");
 
-        canvas.width = videoElement.videoWidth;
+        const canvas =
+          document.createElement(
+            "canvas"
+          );
 
-        canvas.height = videoElement.videoHeight;
 
-        const context = canvas.getContext("2d");
+        canvas.width =
+          videoElement.videoWidth;
 
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        canvas.height =
+          videoElement.videoHeight;
+
+
+        const context =
+          canvas.getContext(
+            "2d"
+          );
+
+
+        context.drawImage(
+          videoElement,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
 
         /*
-         * Convert the captured frame into
-         * a JPEG held temporarily in memory.
+         * Convert the captured frame
+         * into a JPEG held temporarily
+         * in memory.
          */
 
-        return canvas.toDataURL("image/jpeg", 0.85);
+        return canvas.toDataURL(
+          "image/jpeg",
+          0.85
+        );
+
       }
 
-      /* =====================================================
-       CAPTURE MEDICATION
-       ===================================================== */
-
-      captureMedicationBtn.addEventListener("click", () => {
-        const image = captureImage(video);
-
-        if (!image) {
-          return;
-        }
-
-        medicationImage = image;
-
-        /*
-         * Display temporary preview.
-         */
-
-        medicationPreview.src = medicationImage;
-
-        medicationPreviewContainer.style.display = "block";
-
-        /*
-         * Move to Step 2.
-         */
-
-        currentStep = 2;
-
-        document.getElementById("step-1").classList.remove("active");
-
-        document.getElementById("step-2").classList.add("active");
-
-        document.getElementById("indicator-1").classList.add("active");
-
-        document.getElementById("indicator-2").classList.add("active");
-      });
 
       /* =====================================================
-       CAPTURE LABEL
-       ===================================================== */
+         CAPTURE MEDICATION
+         ===================================================== */
 
-      captureLabelBtn.addEventListener("click", () => {
-        const image = captureImage(videoStep2);
+      captureMedicationBtn.addEventListener(
+        "click",
+        () => {
 
-        if (!image) {
-          return;
+          const image =
+            captureImage(
+              video
+            );
+
+
+          if (!image) {
+
+            return;
+
+          }
+
+
+          medicationImage =
+            image;
+
+
+          /*
+           * Display temporary preview.
+           */
+
+          medicationPreview.src =
+            medicationImage;
+
+          medicationPreviewContainer.style.display =
+            "block";
+
+
+          /*
+           * Move to Step 2.
+           */
+
+          document
+            .getElementById("step-1")
+            .classList.remove(
+              "active"
+            );
+
+          document
+            .getElementById("step-2")
+            .classList.add(
+              "active"
+            );
+
+
+          document
+            .getElementById("indicator-1")
+            .classList.add(
+              "active"
+            );
+
+          document
+            .getElementById("indicator-2")
+            .classList.add(
+              "active"
+            );
+
         }
+      );
 
-        labelImage = image;
-
-        /*
-         * Display temporary preview.
-         */
-
-        labelPreview.src = labelImage;
-
-        labelPreviewContainer.style.display = "block";
-
-        /*
-         * Both images have now been captured.
-         * Stop the camera automatically.
-         */
-
-        stopCamera();
-
-        /*
-         * Hide Step 2.
-         */
-
-        document.getElementById("step-2").classList.remove("active");
-
-        /*
-         * Show verification button.
-         */
-
-        verifyBtn.style.display = "block";
-      });
 
       /* =====================================================
-       VERIFY
-       ===================================================== */
+         CAPTURE LABEL
+         ===================================================== */
 
-      verifyBtn.addEventListener("click", async () => {
-        if (!medicationImage || !labelImage) {
-          outputText.innerText =
-            "Both images are required before verification.";
+      captureLabelBtn.addEventListener(
+        "click",
+        () => {
 
-          resultBox.style.display = "block";
+          const image =
+            captureImage(
+              videoStep2
+            );
 
-          return;
+
+          if (!image) {
+
+            return;
+
+          }
+
+
+          labelImage =
+            image;
+
+
+          /*
+           * Display temporary preview.
+           */
+
+          labelPreview.src =
+            labelImage;
+
+          labelPreviewContainer.style.display =
+            "block";
+
+
+          /*
+           * Both images captured.
+           * Stop camera automatically.
+           */
+
+          stopCamera();
+
+
+          /*
+           * Hide Step 2.
+           */
+
+          document
+            .getElementById("step-2")
+            .classList.remove(
+              "active"
+            );
+
+
+          /*
+           * Show verification button.
+           */
+
+          verifyBtn.style.display =
+            "block";
+
         }
+      );
 
-        resultBox.style.display = "block";
 
-        outputText.className = "loading";
+      /* =====================================================
+         VERIFY
+         ===================================================== */
 
-        outputText.innerText =
-          "AI is analyzing the medication and prescription label...";
+      verifyBtn.addEventListener(
+        "click",
+        async () => {
 
-        verifyBtn.disabled = true;
-
-        try {
-          const response = await fetch("/verify", {
-            method: "POST",
-
-            headers: {
-              "Content-Type": "application/json",
-            },
-
-            body: JSON.stringify({
-              staffId: staffId,
-              medImage: medicationImage,
-              labelImage: labelImage,
-            }),
-          });
-
-          const data = await response.json();
-
-          outputText.className = "";
-
-          if (data.result) {
-            const result = data.result;
-
-            const matchText = result.match ? "MATCH" : "DO NOT MATCH";
+          if (
+            !medicationImage ||
+            !labelImage
+          ) {
 
             outputText.innerText =
-              `Verification Result: ${matchText}\n\n` +
-              `Medication: ${result.medication_name}\n` +
-              `Strength: ${result.medication_strength}\n\n` +
-              `Prescription Label: ${result.label_name}\n` +
-              `Strength: ${result.label_strength}\n\n` +
-              `Confidence: ${result.confidence}\n\n` +
-              `Reason: ${result.reason}`;
-          } else if (data.error) {
-            outputText.className = "error";
+              "Both images are required before verification.";
 
-            outputText.innerText = "Error: " + data.error;
-          } else {
-            outputText.innerText = "No verification result was returned.";
+            resultBox.style.display =
+              "block";
+
+            return;
+
           }
-        } catch (error) {
-          console.error("Verification error:", error);
 
-          outputText.className = "error";
+
+          resultBox.style.display =
+            "block";
+
+
+          outputText.className =
+            "loading";
+
 
           outputText.innerText =
-            "Network error connecting to the verification service.";
-        }
+            "AI is analyzing the medication and prescription label...";
 
-        verifyBtn.disabled = false;
-      });
+
+          verifyBtn.disabled =
+            true;
+
+
+          try {
+
+            const response =
+              await fetch(
+                "/verify",
+                {
+                  method: "POST",
+
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+
+                  body:
+                    JSON.stringify(
+                      {
+                        staffId:
+                          staffId,
+
+                        medImage:
+                          medicationImage,
+
+                        labelImage:
+                          labelImage,
+                      }
+                    ),
+
+                }
+              );
+
+
+            const data =
+              await response.json();
+
+
+            outputText.className =
+              "";
+
+
+            if (data.result) {
+
+              const result =
+                data.result;
+
+
+              const matchText =
+                result.match
+                  ? "MATCH"
+                  : "DO NOT MATCH";
+
+
+              outputText.innerText =
+
+                `Verification Result: ${matchText}\n\n` +
+
+                `Medication: ${result.medication_name}\n` +
+
+                `Strength: ${result.medication_strength}\n\n` +
+
+                `Prescription Label: ${result.label_name}\n` +
+
+                `Strength: ${result.label_strength}\n\n` +
+
+                `Confidence: ${result.confidence}\n\n` +
+
+                `Reason: ${result.reason}`;
+
+            } else if (data.error) {
+
+              outputText.className =
+                "error";
+
+
+              outputText.innerText =
+                "Error: " +
+                data.error;
+
+            } else {
+
+              outputText.innerText =
+                "No verification result was returned.";
+
+            }
+
+
+          } catch (error) {
+
+            console.error(
+              "Verification error:",
+              error
+            );
+
+
+            outputText.className =
+              "error";
+
+
+            outputText.innerText =
+              "Network error connecting to the verification service.";
+
+          }
+
+
+          verifyBtn.disabled =
+            false;
+
+        }
+      );
+
 
       /* =====================================================
-       RESET / START NEW VERIFICATION
-       ===================================================== */
+         RESET / START NEW VERIFICATION
+         ===================================================== */
 
-      resetBtn.addEventListener("click", () => {
-        resetApp();
-      });
+      resetBtn.addEventListener(
+        "click",
+        () => {
+
+          resetApp();
+
+        }
+      );
+
 
       function resetApp() {
+
         /*
          * Stop camera.
          */
 
         stopCamera();
 
+
         /*
-         * Clear captured images from memory.
+         * Clear captured images
+         * from memory.
          */
 
         medicationImage = null;
+
         labelImage = null;
+
 
         /*
          * Clear previews.
          */
 
-        medicationPreview.src = "";
-        labelPreview.src = "";
+        medicationPreview.src =
+          "";
 
-        medicationPreviewContainer.style.display = "none";
+        labelPreview.src =
+          "";
 
-        labelPreviewContainer.style.display = "none";
+
+        medicationPreviewContainer.style.display =
+          "none";
+
+        labelPreviewContainer.style.display =
+          "none";
+
 
         /*
          * Clear result.
          */
 
-        outputText.innerText = "";
+        outputText.innerText =
+          "";
 
-        outputText.className = "";
+        outputText.className =
+          "";
 
-        resultBox.style.display = "none";
+        resultBox.style.display =
+          "none";
+
 
         /*
          * Hide verification button.
          */
 
-        verifyBtn.style.display = "none";
+        verifyBtn.style.display =
+          "none";
 
-        verifyBtn.disabled = false;
+        verifyBtn.disabled =
+          false;
+
 
         /*
          * Clear Staff ID.
          */
+
         staffId = null;
-        staffIdInput.value = "";
-        staffIdError.style.display = "none";
+
+        staffIdInput.value =
+          "";
+
+        staffIdError.style.display =
+          "none";
+
 
         /*
          * Hide Step 1 and Step 2.
          */
 
-        document.getElementById("step-1").classList.remove("active");
-        document.getElementById("step-2").classList.remove("active");
+        document
+          .getElementById("step-1")
+          .classList.remove(
+            "active"
+          );
+
+        document
+          .getElementById("step-2")
+          .classList.remove(
+            "active"
+          );
+
 
         /*
          * Show Staff ID screen.
          */
 
-        staffIdScreen.classList.add("active");
+        staffIdScreen.classList.add(
+          "active"
+        );
+
+
         /*
          * Reset progress indicator.
          */
 
-        document.getElementById("indicator-1").classList.add("active");
+        document
+          .getElementById("indicator-1")
+          .classList.add(
+            "active"
+          );
 
-        document.getElementById("indicator-2").classList.remove("active");
+        document
+          .getElementById("indicator-2")
+          .classList.remove(
+            "active"
+          );
 
-        /*
-         * Camera remains OFF after reset.
-         * User can press "Start Camera" when ready.
-         */
       }
 
-      /* =====================================================
-       PAGE EXIT
-       ===================================================== */
-
-      window.addEventListener("beforeunload", () => {
-        /*
-         * Stop camera.
-         */
-
-        stopCamera();
-
-        /*
-         * Remove image references.
-         */
-
-        medicationImage = null;
-        labelImage = null;
-      });
 
       /* =====================================================
-       INITIAL STATE
-       ===================================================== */
+         SCAN HISTORY
+         ===================================================== */
+
+      const historyTableBody =
+        document.getElementById(
+          "history-table-body"
+        );
+
+      const historyLoading =
+        document.getElementById(
+          "history-loading"
+        );
+
+      const historyError =
+        document.getElementById(
+          "history-error"
+        );
+
+      const historyEmpty =
+        document.getElementById(
+          "history-empty"
+        );
+
+      const historySearch =
+        document.getElementById(
+          "history-search"
+        );
+
+      const historyResultFilter =
+        document.getElementById(
+          "history-result-filter"
+        );
+
+      const historyDetailBox =
+        document.getElementById(
+          "history-detail-box"
+        );
+
+      const historyDetailContent =
+        document.getElementById(
+          "history-detail-content"
+        );
+
+      const closeDetailBtn =
+        document.getElementById(
+          "close-detail-btn"
+        );
+
+
+      let scanHistoryRecords = [];
+
+
+      /* =====================================================
+         SHOW HISTORY
+         ===================================================== */
+
+      showHistoryBtn.addEventListener(
+        "click",
+        () => {
+
+          /*
+           * Stop camera if somehow active.
+           */
+
+          stopCamera();
+
+
+          /*
+           * Hide verification interface.
+           */
+
+          verificationInterface.style.display =
+            "none";
+
+
+          /*
+           * Show history.
+           */
+
+          scanHistoryScreen.classList.add(
+            "active"
+          );
+
+
+          /*
+           * Hide detail view.
+           */
+
+          historyDetailBox.style.display =
+            "none";
+
+
+          loadScanHistory();
+
+        }
+      );
+
+
+      /* =====================================================
+         RETURN TO VERIFICATION
+         ===================================================== */
+
+      backToVerificationBtn.addEventListener(
+        "click",
+        () => {
+
+          scanHistoryScreen.classList.remove(
+            "active"
+          );
+
+
+          verificationInterface.style.display =
+            "block";
+
+
+          /*
+           * Start a fresh verification.
+           */
+
+          resetApp();
+
+        }
+      );
+
+
+      /* =====================================================
+         LOAD HISTORY
+         ===================================================== */
+
+      async function loadScanHistory() {
+
+        historyLoading.style.display =
+          "block";
+
+        historyError.style.display =
+          "none";
+
+        historyEmpty.style.display =
+          "none";
+
+
+        historyTableBody.innerHTML =
+          "";
+
+
+        try {
+
+          const response =
+            await fetch(
+              "/history"
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              data.error ||
+              "Unable to load scan history."
+            );
+
+          }
+
+
+          scanHistoryRecords =
+            data.records || [];
+
+
+          renderScanHistory();
+
+
+        } catch (error) {
+
+          console.error(
+            "Scan history error:",
+            error
+          );
+
+
+          historyError.innerText =
+            "Unable to load scan history.";
+
+
+          historyError.style.display =
+            "block";
+
+
+        } finally {
+
+          historyLoading.style.display =
+            "none";
+
+        }
+
+      }
+
+
+      /* =====================================================
+         RENDER HISTORY
+         ===================================================== */
+
+      function renderScanHistory() {
+
+        const searchTerm =
+          historySearch.value
+            .trim()
+            .toLowerCase();
+
+
+        const resultFilter =
+          historyResultFilter.value;
+
+
+        const filteredRecords =
+          scanHistoryRecords.filter(
+            (record) => {
+
+              /*
+               * Search Staff ID or medication.
+               */
+
+              const matchesSearch =
+                !searchTerm ||
+
+                String(
+                  record.staff_id || ""
+                )
+                  .toLowerCase()
+                  .includes(
+                    searchTerm
+                  ) ||
+
+                String(
+                  record.medication_name || ""
+                )
+                  .toLowerCase()
+                  .includes(
+                    searchTerm
+                  ) ||
+
+                String(
+                  record.label_name || ""
+                )
+                  .toLowerCase()
+                  .includes(
+                    searchTerm
+                  );
+
+
+              /*
+               * Result filter.
+               */
+
+              let matchesResult =
+                true;
+
+
+              if (
+                resultFilter ===
+                "match"
+              ) {
+
+                matchesResult =
+                  record.match === true;
+
+              } else if (
+                resultFilter ===
+                "no-match"
+              ) {
+
+                matchesResult =
+                  record.match === false;
+
+              }
+
+
+              return (
+                matchesSearch &&
+                matchesResult
+              );
+
+            }
+          );
+
+
+        historyTableBody.innerHTML =
+          "";
+
+
+        /*
+         * No records.
+         */
+
+        if (
+          filteredRecords.length === 0
+        ) {
+
+          historyEmpty.style.display =
+            "block";
+
+          return;
+
+        }
+
+
+        historyEmpty.style.display =
+          "none";
+
+
+        /*
+         * Create rows.
+         */
+
+        filteredRecords.forEach(
+          (record) => {
+
+            const row =
+              document.createElement(
+                "tr"
+              );
+
+
+            /*
+             * Date / Time
+             */
+
+            const dateCell =
+              document.createElement(
+                "td"
+              );
+
+            dateCell.innerText =
+              formatDateTime(
+                record.created_at
+              );
+
+
+            /*
+             * Staff ID
+             */
+
+            const staffCell =
+              document.createElement(
+                "td"
+              );
+
+            staffCell.innerText =
+              record.staff_id ||
+              "-";
+
+
+            /*
+             * Medication
+             */
+
+            const medicationCell =
+              document.createElement(
+                "td"
+              );
+
+            medicationCell.innerText =
+              formatMedication(
+                record.medication_name,
+                record.medication_strength
+              );
+
+
+            /*
+             * Label
+             */
+
+            const labelCell =
+              document.createElement(
+                "td"
+              );
+
+            labelCell.innerText =
+              formatMedication(
+                record.label_name,
+                record.label_strength
+              );
+
+
+            /*
+             * Result
+             */
+
+            const resultCell =
+              document.createElement(
+                "td"
+              );
+
+
+            const resultBadge =
+              document.createElement(
+                "span"
+              );
+
+
+            resultBadge.classList.add(
+              "result-badge"
+            );
+
+
+            if (
+              record.match === true
+            ) {
+
+              resultBadge.classList.add(
+                "result-match"
+              );
+
+              resultBadge.innerText =
+                "MATCH";
+
+            } else {
+
+              resultBadge.classList.add(
+                "result-no-match"
+              );
+
+              resultBadge.innerText =
+                "DO NOT MATCH";
+
+            }
+
+
+            resultCell.appendChild(
+              resultBadge
+            );
+
+
+            /*
+             * Confidence
+             */
+
+            const confidenceCell =
+              document.createElement(
+                "td"
+              );
+
+            confidenceCell.className =
+              "confidence-text";
+
+            confidenceCell.innerText =
+              record.confidence ||
+              "-";
+
+
+            /*
+             * Details
+             */
+
+            const detailsCell =
+              document.createElement(
+                "td"
+              );
+
+
+            const detailsBtn =
+              document.createElement(
+                "button"
+              );
+
+
+            detailsBtn.className =
+              "details-btn";
+
+            detailsBtn.innerText =
+              "View";
+
+
+            detailsBtn.addEventListener(
+              "click",
+              () => {
+
+                showHistoryDetails(
+                  record
+                );
+
+              }
+            );
+
+
+            detailsCell.appendChild(
+              detailsBtn
+            );
+
+
+            /*
+             * Add cells.
+             */
+
+            row.appendChild(
+              dateCell
+            );
+
+            row.appendChild(
+              staffCell
+            );
+
+            row.appendChild(
+              medicationCell
+            );
+
+            row.appendChild(
+              labelCell
+            );
+
+            row.appendChild(
+              resultCell
+            );
+
+            row.appendChild(
+              confidenceCell
+            );
+
+            row.appendChild(
+              detailsCell
+            );
+
+
+            historyTableBody.appendChild(
+              row
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         FORMAT MEDICATION
+         ===================================================== */
+
+      function formatMedication(
+        name,
+        strength
+      ) {
+
+        const medicationName =
+          name ||
+          "Unknown";
+
+
+        const medicationStrength =
+          strength ||
+          "Unknown";
+
+
+        return (
+          medicationName +
+          " (" +
+          medicationStrength +
+          ")"
+        );
+
+      }
+
+
+      /* =====================================================
+         FORMAT DATE / TIME
+         ===================================================== */
+
+      function formatDateTime(
+        timestamp
+      ) {
+
+        if (!timestamp) {
+
+          return "-";
+
+        }
+
+
+        const date =
+          new Date(
+            timestamp
+          );
+
+
+        return date.toLocaleString(
+          "en-SG",
+          {
+            dateStyle:
+              "medium",
+
+            timeStyle:
+              "short",
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         SHOW HISTORY DETAILS
+         ===================================================== */
+
+      function showHistoryDetails(
+        record
+      ) {
+
+        historyDetailContent.innerHTML =
+          "";
+
+
+        /*
+         * Helper to safely create
+         * detail rows without using
+         * untrusted data as HTML.
+         */
+
+        function addDetail(
+          label,
+          value
+        ) {
+
+          const row =
+            document.createElement(
+              "div"
+            );
+
+          row.className =
+            "detail-row";
+
+
+          const labelElement =
+            document.createElement(
+              "div"
+            );
+
+          labelElement.className =
+            "detail-label";
+
+          labelElement.innerText =
+            label;
+
+
+          const valueElement =
+            document.createElement(
+              "div"
+            );
+
+          valueElement.className =
+            "detail-value";
+
+          valueElement.innerText =
+            value ||
+            "-";
+
+
+          row.appendChild(
+            labelElement
+          );
+
+          row.appendChild(
+            valueElement
+          );
+
+
+          historyDetailContent.appendChild(
+            row
+          );
+
+        }
+
+
+        addDetail(
+          "Date / Time",
+          formatDateTime(
+            record.created_at
+          )
+        );
+
+
+        addDetail(
+          "Staff ID",
+          record.staff_id
+        );
+
+
+        addDetail(
+          "Medication",
+          record.medication_name
+        );
+
+
+        addDetail(
+          "Medication Strength",
+          record.medication_strength
+        );
+
+
+        addDetail(
+          "Prescription Label",
+          record.label_name
+        );
+
+
+        addDetail(
+          "Label Strength",
+          record.label_strength
+        );
+
+
+        addDetail(
+          "Result",
+          record.match
+            ? "MATCH"
+            : "DO NOT MATCH"
+        );
+
+
+        addDetail(
+          "Confidence",
+          record.confidence
+        );
+
+
+        addDetail(
+          "Reason",
+          record.reason
+        );
+
+
+        historyDetailBox.style.display =
+          "block";
+
+
+        historyDetailBox.scrollIntoView({
+          behavior:
+            "smooth",
+
+          block:
+            "nearest",
+        });
+
+      }
+
+
+      /* =====================================================
+         CLOSE HISTORY DETAILS
+         ===================================================== */
+
+      closeDetailBtn.addEventListener(
+        "click",
+        () => {
+
+          historyDetailBox.style.display =
+            "none";
+
+        }
+      );
+
+
+      /* =====================================================
+         HISTORY FILTER EVENTS
+         ===================================================== */
+
+      historySearch.addEventListener(
+        "input",
+        () => {
+
+          renderScanHistory();
+
+        }
+      );
+
+
+      historyResultFilter.addEventListener(
+        "change",
+        () => {
+
+          renderScanHistory();
+
+        }
+      );
+
+
+      /* =====================================================
+         PAGE EXIT
+         ===================================================== */
+
+      window.addEventListener(
+        "beforeunload",
+        () => {
+
+          /*
+           * Stop camera.
+           */
+
+          stopCamera();
+
+
+          /*
+           * Remove image references.
+           */
+
+          medicationImage = null;
+
+          labelImage = null;
+
+        }
+      );
+
+
+      /* =====================================================
+         INITIAL STATE
+         ===================================================== */
 
       /*
        * Camera intentionally does NOT start automatically.
@@ -956,6 +2943,8 @@
        */
 
       stopCamera();
+
     </script>
+
   </body>
 </html>

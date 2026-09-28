@@ -302,6 +302,40 @@ Do not include any text outside the JSON object.
 
 
 # ============================================================
+# SCAN HISTORY
+# ============================================================
+
+@app.route("/history", methods=["GET"])
+def scan_history():
+
+    try:
+
+        # Retrieve scan records from Supabase
+        response = (
+            supabase
+            .table("scan_records")
+            .select("*")
+            .order("created_at", desc=True)
+            .limit(100)
+            .execute()
+        )
+
+        return jsonify({
+            "records": response.data
+        })
+
+    except Exception as e:
+
+        print(
+            "Scan history error:",
+            repr(e)
+        )
+
+        return jsonify({
+            "error": "Unable to retrieve scan history."
+        }), 500
+
+# ============================================================
 # VERCEL HANDLER
 # ============================================================
 
