@@ -1,446 +1,520 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Medication Scanner</title>
 
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            text-align: center;
-            background: #f5f5f7;
-        }
+```
+<title>AI Medication Verification</title>
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-        video {
-            width: 100%;
-            border-radius: 8px;
-            background: #000;
-        }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f7;
+        color: #1d1d1f;
+    }
 
-        button {
-            background: #0071e3;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 15px;
-            font-weight: bold;
-        }
+    .container {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
 
-        button:hover {
-            background: #0077ed;
-        }
+    h1 {
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
 
-        button:disabled {
-            background: #aaa;
-            cursor: not-allowed;
-        }
+    .subtitle {
+        color: #666;
+        margin-bottom: 20px;
+    }
 
-        #instruction {
-            margin: 15px 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
+    .step {
+        display: none;
+    }
 
-        #status {
-            margin-top: 10px;
-            color: #666;
-        }
+    .step.active {
+        display: block;
+    }
 
-        #result-box {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            background: #e8e8ed;
-            text-align: left;
-            white-space: pre-line;
-            display: none;
-        }
+    .step-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
 
-        .loading {
-            color: #666;
-            font-style: italic;
-        }
+    .step-description {
+        color: #666;
+        margin-bottom: 15px;
+    }
 
-        .success {
-            color: #16803c;
-        }
+    /* Camera */
 
-        .error {
-            color: #c62828;
-        }
+    .camera-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 12px;
+        background: #000;
+    }
 
-        .preview-container {
-            display: none;
-            margin-top: 15px;
-        }
+    video {
+        width: 100%;
+        display: block;
+        border-radius: 12px;
+        background: #000;
+    }
 
-        .preview-container img {
-            width: 100%;
-            max-height: 250px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
+    /*
+     * The camera is NOT mirrored by default.
+     * This is intentional because the rear camera should
+     * display the scene naturally.
+     */
 
-        .retake-btn {
-            background: #666;
-            margin-top: 10px;
-        }
+    /* Buttons */
 
-        .retake-btn:hover {
-            background: #555;
-        }
-    </style>
+    button {
+        width: 100%;
+        border: none;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-top: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .primary-btn {
+        background: #0071e3;
+        color: white;
+    }
+
+    .secondary-btn {
+        background: #e8e8ed;
+        color: #1d1d1f;
+    }
+
+    .reset-btn {
+        background: #f2f2f2;
+        color: #333;
+    }
+
+    .verify-btn {
+        background: #34a853;
+        color: white;
+    }
+
+    /* Camera switch */
+
+    #switch-camera-btn {
+        display: none;
+    }
+
+    /* Preview */
+
+    .preview-container {
+        margin-top: 20px;
+    }
+
+    .preview-container h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .preview {
+        width: 100%;
+        border-radius: 10px;
+        display: block;
+        background: #f2f2f2;
+    }
+
+    /* Result */
+
+    #result-box {
+        display: none;
+        margin-top: 25px;
+        padding: 18px;
+        border-radius: 12px;
+        background: #f0f0f5;
+        text-align: left;
+    }
+
+    #result-box h3 {
+        margin-top: 0;
+    }
+
+    #output-text {
+        white-space: pre-line;
+        line-height: 1.5;
+    }
+
+    .loading {
+        color: #666;
+        font-style: italic;
+    }
+
+    .error {
+        color: #c00;
+    }
+
+    /* Status */
+
+    #camera-status {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+    }
+
+    /* Privacy note */
+
+    .privacy-note {
+        margin-top: 20px;
+        padding: 12px;
+        background: #f7f7f7;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #666;
+        line-height: 1.4;
+    }
+
+    /* Step indicator */
+
+    .step-indicator {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .indicator {
+        flex: 1;
+        height: 5px;
+        border-radius: 5px;
+        background: #ddd;
+    }
+
+    .indicator.active {
+        background: #0071e3;
+    }
+</style>
+```
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <h2>Medication Verification Scanner</h2>
+```
+<h1>Medication Verification</h1>
 
-    <p>
-        Capture the medication packaging and prescription label
-        to check whether they match.
-    </p>
+<p class="subtitle">
+    Capture the medication packaging and prescription label to verify that they match.
+</p>
 
-    <!-- Current step -->
-    <div id="instruction">
-        Step 1: Capture the medication box or bottle
+<!-- Step indicator -->
+<div class="step-indicator">
+    <div id="indicator-1" class="indicator active"></div>
+    <div id="indicator-2" class="indicator"></div>
+</div>
+
+
+<!-- =====================================================
+     STEP 1 — MEDICATION
+     ===================================================== -->
+
+<div id="step-1" class="step active">
+
+    <div class="step-title">
+        Step 1: Capture Medication
     </div>
 
-    <!-- Camera -->
-    <video id="webcam" autoplay playsinline></video>
+    <div class="step-description">
+        Position the medication box or bottle clearly inside the camera view.
+    </div>
 
-    <!-- Capture button -->
-    <button id="capture-btn">
-        Capture Medication
+    <div class="camera-container">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+
+    <div id="camera-status">
+        Starting camera...
+    </div>
+
+    <button
+        id="capture-medication-btn"
+        class="primary-btn">
+        📷 Capture Medication
     </button>
 
-    <!-- Preview of captured image -->
-    <div id="med-preview-container" class="preview-container">
-        <p><strong>Medication image captured</strong></p>
-        <img id="med-preview" alt="Medication preview">
-    </div>
-
-    <div id="label-preview-container" class="preview-container">
-        <p><strong>Prescription label captured</strong></p>
-        <img id="label-preview" alt="Prescription label preview">
-    </div>
-
-    <!-- Retake button -->
-    <button id="retake-btn" class="retake-btn" style="display:none;">
-        Retake
+    <button
+        id="switch-camera-btn"
+        class="secondary-btn">
+        🔄 Switch Camera
     </button>
 
-    <!-- Result -->
-    <div id="result-box">
-        <h3>Verification Result:</h3>
-        <p id="output-text"></p>
+</div>
+
+
+<!-- =====================================================
+     STEP 2 — LABEL
+     ===================================================== -->
+
+<div id="step-2" class="step">
+
+    <div class="step-title">
+        Step 2: Capture Prescription Label
     </div>
 
-    <div id="status"></div>
+    <div class="step-description">
+        Position the prescription or cartfill label clearly inside the camera view.
+    </div>
+
+    <div class="camera-container">
+        <video id="webcam-step-2" autoplay playsinline></video>
+    </div>
+
+    <button
+        id="capture-label-btn"
+        class="primary-btn">
+        📷 Capture Prescription Label
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     PREVIEWS
+     ===================================================== -->
+
+<div id="medication-preview-container" class="preview-container" style="display:none;">
+
+    <h3>Medication Image</h3>
+
+    <img
+        id="medication-preview"
+        class="preview"
+        alt="Captured medication">
+
+</div>
+
+
+<div id="label-preview-container" class="preview-container" style="display:none;">
+
+    <h3>Prescription Label Image</h3>
+
+    <img
+        id="label-preview"
+        class="preview"
+        alt="Captured prescription label">
+
+</div>
+
+
+<!-- =====================================================
+     VERIFY
+     ===================================================== -->
+
+<button
+    id="verify-btn"
+    class="verify-btn"
+    style="display:none;">
+    🔍 Scan & Verify Match
+</button>
+
+
+<!-- =====================================================
+     RESET
+     ===================================================== -->
+
+<button
+    id="reset-btn"
+    class="reset-btn">
+    ↻ Start New Verification
+</button>
+
+
+<!-- =====================================================
+     RESULT
+     ===================================================== -->
+
+<div id="result-box">
+
+    <h3>Verification Result</h3>
+
+    <p id="output-text"></p>
+
+</div>
+
+
+<!-- =====================================================
+     PRIVACY
+     ===================================================== -->
+
+<div class="privacy-note">
+    Images are kept only temporarily in this webpage while verification
+    is being performed. This page does not save captured images to
+    localStorage, sessionStorage, or downloadable files.
+</div>
+```
 
 </div>
 
 <script>
 
-    const video = document.getElementById('webcam');
-    const captureButton = document.getElementById('capture-btn');
-    const retakeButton = document.getElementById('retake-btn');
+    /* =====================================================
+       VARIABLES
+       ===================================================== */
 
-    const instruction = document.getElementById('instruction');
-    const status = document.getElementById('status');
+    const video = document.getElementById("webcam");
+    const videoStep2 = document.getElementById("webcam-step-2");
 
-    const resultBox = document.getElementById('result-box');
-    const outputText = document.getElementById('output-text');
+    const captureMedicationBtn =
+        document.getElementById("capture-medication-btn");
 
-    const medPreviewContainer =
-        document.getElementById('med-preview-container');
+    const captureLabelBtn =
+        document.getElementById("capture-label-btn");
 
-    const labelPreviewContainer =
-        document.getElementById('label-preview-container');
+    const switchCameraBtn =
+        document.getElementById("switch-camera-btn");
 
-    const medPreview =
-        document.getElementById('med-preview');
+    const verifyBtn =
+        document.getElementById("verify-btn");
+
+    const resetBtn =
+        document.getElementById("reset-btn");
+
+    const resultBox =
+        document.getElementById("result-box");
+
+    const outputText =
+        document.getElementById("output-text");
+
+    const cameraStatus =
+        document.getElementById("camera-status");
+
+    const medicationPreview =
+        document.getElementById("medication-preview");
 
     const labelPreview =
-        document.getElementById('label-preview');
+        document.getElementById("label-preview");
+
+    const medicationPreviewContainer =
+        document.getElementById("medication-preview-container");
+
+    const labelPreviewContainer =
+        document.getElementById("label-preview-container");
 
 
-    // Store images temporarily in JavaScript memory only.
+    /* =====================================================
+       APP STATE
+       ===================================================== */
+
     let medicationImage = null;
     let labelImage = null;
 
-    // Track which image we are currently capturing.
-    let currentStep = 'medication';
-
-
-    // --------------------------------------------------
-    // 1. Start camera
-    // --------------------------------------------------
-
     let cameraStream = null;
 
-    navigator.mediaDevices.getUserMedia({
-    video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-    }
-    })
-    .then(stream => {
-        cameraStream = stream;
-        video.srcObject = stream;
-    })
-    .catch(err => {
-        console.error(err);
-        status.innerText =
-            "Unable to access the camera. Please check your browser permissions.";
-        status.className = "error";
-    });
+    let usingBackCamera = true;
+
+    let currentStep = 1;
 
 
-    // --------------------------------------------------
-    // 2. Capture image
-    // --------------------------------------------------
+    /* =====================================================
+       START CAMERA
+       ===================================================== */
 
-    captureButton.addEventListener('click', () => {
+    async function startCamera() {
 
-        const canvas = document.createElement('canvas');
+        /*
+         * Stop the previous camera before starting another one.
+         * This is important when switching between front/rear cameras.
+         */
 
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        stopCamera();
 
-        const ctx = canvas.getContext('2d');
+        cameraStatus.innerText = "Starting camera...";
 
-        // Capture current camera frame
-        ctx.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
+        try {
 
-        // Convert image to JPEG Base64
-        const imageDataUrl = canvas.toDataURL(
-            'image/jpeg',
-            0.85
-        );
+            const constraints = {
+                video: {
+                    facingMode: usingBackCamera
+                        ? { ideal: "environment" }
+                        : { ideal: "user" },
 
+                    width: {
+                        ideal: 1280
+                    },
 
-        // ----------------------------------------------
-        // Step 1: Medication
-        // ----------------------------------------------
+                    height: {
+                        ideal: 720
+                    }
+                },
 
-        if (currentStep === 'medication') {
+                audio: false
+            };
 
-            medicationImage = imageDataUrl;
+            cameraStream =
+                await navigator.mediaDevices.getUserMedia(constraints);
 
-            // Show preview
-            medPreview.src = medicationImage;
-            medPreviewContainer.style.display = 'block';
+            /*
+             * Both video elements use the same stream.
+             */
 
-            // Move to step 2
-            currentStep = 'label';
+            video.srcObject = cameraStream;
+            videoStep2.srcObject = cameraStream;
 
-            instruction.innerText =
-                "Step 2: Hold up the prescription or cartfill label";
+            cameraStatus.innerText =
+                usingBackCamera
+                    ? "Rear camera active"
+                    : "Front camera active";
 
-            captureButton.innerText =
-                "Capture Prescription Label";
+            /*
+             * Check whether the device actually has multiple cameras.
+             */
 
-            retakeButton.style.display = 'inline-block';
+            await checkAvailableCameras();
 
-            status.innerText =
-                "Medication captured. Now capture the prescription label.";
+        } catch (error) {
 
-            return;
+            console.error("Camera error:", error);
+
+            cameraStatus.innerText =
+                "Unable to access the selected camera.";
+
+            cameraStatus.className = "error";
+
         }
-
-
-        // ----------------------------------------------
-        // Step 2: Prescription label
-        // ----------------------------------------------
-
-        if (currentStep === 'label') {
-
-            labelImage = imageDataUrl;
-
-            // Show preview
-            labelPreview.src = labelImage;
-            labelPreviewContainer.style.display = 'block';
-
-            captureButton.disabled = true;
-            retakeButton.style.display = 'inline-block';
-
-            instruction.innerText =
-                "Both images captured";
-
-            status.innerText =
-                "Sending both images for AI verification...";
-
-            verifyImages();
-        }
-
-    });
-
-
-    // --------------------------------------------------
-    // 3. Send both images to Flask
-    // --------------------------------------------------
-
-    function verifyImages() {
-
-        if (!medicationImage || !labelImage) {
-
-            outputText.innerText =
-                "Both images are required.";
-
-            resultBox.style.display = 'block';
-
-            return;
-        }
-
-
-        resultBox.style.display = 'block';
-
-        outputText.className = 'loading';
-
-        outputText.innerText =
-            'AI is analyzing the medication and prescription label...';
-
-
-        fetch('/verify', {
-
-            method: 'POST',
-
-            headers: {
-                'Content-Type': 'application/json'
-            },
-
-            body: JSON.stringify({
-
-                // These names MUST match Flask
-                medImage: medicationImage,
-                labelImage: labelImage
-
-            })
-
-        })
-
-        .then(async response => {
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.error || 'Verification failed.'
-                );
-            }
-
-            return data;
-
-        })
-
-        .then(data => {
-
-            outputText.className = '';
-
-            if (data.result) {
-
-                outputText.innerText = data.result;
-
-                status.innerText =
-                    "Verification completed.";
-
-                status.className = "success";
-
-            } else if (data.error) {
-
-                outputText.innerText =
-                    "Error: " + data.error;
-
-                status.className = "error";
-            }
-
-        })
-
-        .catch(err => {
-
-            console.error(err);
-
-            outputText.className = 'error';
-
-            outputText.innerText =
-                "Error: " + err.message;
-
-            status.innerText =
-                "Unable to complete verification.";
-
-            status.className = "error";
-
-        });
 
     }
 
 
-    // --------------------------------------------------
-    // 4. Retake
-    // --------------------------------------------------
+    /* =====================================================
+       STOP CAMERA
+       ===================================================== */
 
-    retakeButton.addEventListener('click', () => {
-
-        medicationImage = null;
-        labelImage = null;
-
-        currentStep = 'medication';
-
-        medPreview.src = '';
-        labelPreview.src = '';
-
-        medPreviewContainer.style.display = 'none';
-        labelPreviewContainer.style.display = 'none';
-
-        captureButton.disabled = false;
-
-        captureButton.innerText =
-            "Capture Medication";
-
-        retakeButton.style.display = 'none';
-
-        instruction.innerText =
-            "Step 1: Capture the medication box or bottle";
-
-        status.innerText =
-            "Ready for a new scan.";
-
-        resultBox.style.display = 'none';
-
-        outputText.innerText = '';
-
-    });
-
-
-    // --------------------------------------------------
-    // 5. Stop camera when leaving page
-    // --------------------------------------------------
-
-    window.addEventListener('beforeunload', () => {
+    function stopCamera() {
 
         if (cameraStream) {
 
@@ -448,9 +522,492 @@
                 .getTracks()
                 .forEach(track => track.stop());
 
+            cameraStream = null;
         }
 
+    }
+
+
+    /* =====================================================
+       CHECK AVAILABLE CAMERAS
+       ===================================================== */
+
+    async function checkAvailableCameras() {
+
+        try {
+
+            const devices =
+                await navigator.mediaDevices.enumerateDevices();
+
+            const cameras =
+                devices.filter(
+                    device => device.kind === "videoinput"
+                );
+
+            /*
+             * Only show the switch button if there is
+             * more than one camera.
+             */
+
+            if (cameras.length > 1) {
+
+                switchCameraBtn.style.display = "block";
+
+            } else {
+
+                switchCameraBtn.style.display = "none";
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Unable to enumerate cameras:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       SWITCH CAMERA
+       ===================================================== */
+
+    switchCameraBtn.addEventListener("click", async () => {
+
+        usingBackCamera = !usingBackCamera;
+
+        await startCamera();
+
     });
+
+
+    /* =====================================================
+       CAPTURE IMAGE
+       ===================================================== */
+
+    function captureImage(videoElement) {
+
+        /*
+         * Make sure the video has loaded before capturing.
+         */
+
+        if (
+            !videoElement.videoWidth ||
+            !videoElement.videoHeight
+        ) {
+
+            alert(
+                "Camera is not ready yet. Please wait a moment and try again."
+            );
+
+            return null;
+        }
+
+
+        const canvas =
+            document.createElement("canvas");
+
+        canvas.width =
+            videoElement.videoWidth;
+
+        canvas.height =
+            videoElement.videoHeight;
+
+
+        const context =
+            canvas.getContext("2d");
+
+
+        context.drawImage(
+            videoElement,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        /*
+         * JPEG quality of 0.85 provides a good balance between
+         * image quality and request size.
+         */
+
+        return canvas.toDataURL(
+            "image/jpeg",
+            0.85
+        );
+
+    }
+
+
+    /* =====================================================
+       CAPTURE MEDICATION
+       ===================================================== */
+
+    captureMedicationBtn.addEventListener(
+        "click",
+        () => {
+
+            const image =
+                captureImage(video);
+
+            if (!image) {
+                return;
+            }
+
+
+            medicationImage = image;
+
+
+            /*
+             * Show a temporary preview.
+             *
+             * This is only held in browser memory.
+             */
+
+            medicationPreview.src =
+                medicationImage;
+
+            medicationPreviewContainer.style.display =
+                "block";
+
+
+            /*
+             * Move to Step 2.
+             */
+
+            currentStep = 2;
+
+            document
+                .getElementById("step-1")
+                .classList.remove("active");
+
+            document
+                .getElementById("step-2")
+                .classList.add("active");
+
+
+            document
+                .getElementById("indicator-1")
+                .classList.add("active");
+
+            document
+                .getElementById("indicator-2")
+                .classList.add("active");
+
+        }
+    );
+
+
+    /* =====================================================
+       CAPTURE LABEL
+       ===================================================== */
+
+    captureLabelBtn.addEventListener(
+        "click",
+        () => {
+
+            const image =
+                captureImage(videoStep2);
+
+            if (!image) {
+                return;
+            }
+
+
+            labelImage = image;
+
+
+            /*
+             * Show temporary preview.
+             */
+
+            labelPreview.src =
+                labelImage;
+
+            labelPreviewContainer.style.display =
+                "block";
+
+
+            /*
+             * Stop camera after both images have
+             * been captured.
+             */
+
+            stopCamera();
+
+
+            /*
+             * Hide Step 2.
+             */
+
+            document
+                .getElementById("step-2")
+                .classList.remove("active");
+
+
+            /*
+             * Show verification button.
+             */
+
+            verifyBtn.style.display =
+                "block";
+
+        }
+    );
+
+
+    /* =====================================================
+       VERIFY
+       ===================================================== */
+
+    verifyBtn.addEventListener(
+        "click",
+        async () => {
+
+            if (!medicationImage || !labelImage) {
+
+                outputText.innerText =
+                    "Both images are required before verification.";
+
+                resultBox.style.display =
+                    "block";
+
+                return;
+            }
+
+
+            resultBox.style.display =
+                "block";
+
+            outputText.className =
+                "loading";
+
+            outputText.innerText =
+                "AI is analyzing the medication and prescription label...";
+
+
+            verifyBtn.disabled = true;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/verify",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                medImage:
+                                    medicationImage,
+
+                                labelImage:
+                                    labelImage
+
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                outputText.className = "";
+
+
+                if (data.result) {
+
+                    outputText.innerText =
+                        data.result;
+
+                } else if (data.error) {
+
+                    outputText.className =
+                        "error";
+
+                    outputText.innerText =
+                        "Error: " + data.error;
+
+                } else {
+
+                    outputText.innerText =
+                        "No verification result was returned.";
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Verification error:",
+                    error
+                );
+
+                outputText.className =
+                    "error";
+
+                outputText.innerText =
+                    "Network error connecting to the verification service.";
+
+            }
+
+
+            verifyBtn.disabled = false;
+
+        }
+    );
+
+
+    /* =====================================================
+       RESET / START NEW VERIFICATION
+       ===================================================== */
+
+    resetBtn.addEventListener(
+        "click",
+        () => {
+
+            resetApp();
+
+        }
+    );
+
+
+    function resetApp() {
+
+        /*
+         * Stop camera first.
+         */
+
+        stopCamera();
+
+
+        /*
+         * Remove references to captured images.
+         */
+
+        medicationImage = null;
+        labelImage = null;
+
+
+        /*
+         * Clear image previews.
+         */
+
+        medicationPreview.src = "";
+        labelPreview.src = "";
+
+
+        medicationPreviewContainer.style.display =
+            "none";
+
+        labelPreviewContainer.style.display =
+            "none";
+
+
+        /*
+         * Clear verification result.
+         */
+
+        outputText.innerText = "";
+        outputText.className = "";
+
+        resultBox.style.display =
+            "none";
+
+
+        /*
+         * Hide verification button.
+         */
+
+        verifyBtn.style.display =
+            "none";
+
+        verifyBtn.disabled =
+            false;
+
+
+        /*
+         * Return to Step 1.
+         */
+
+        currentStep = 1;
+
+        document
+            .getElementById("step-1")
+            .classList.add("active");
+
+        document
+            .getElementById("step-2")
+            .classList.remove("active");
+
+
+        /*
+         * Reset progress indicator.
+         */
+
+        document
+            .getElementById("indicator-1")
+            .classList.add("active");
+
+        document
+            .getElementById("indicator-2")
+            .classList.remove("active");
+
+
+        /*
+         * Restart the rear camera.
+         */
+
+        usingBackCamera = true;
+
+        startCamera();
+
+    }
+
+
+    /* =====================================================
+       PAGE EXIT
+       ===================================================== */
+
+    window.addEventListener(
+        "beforeunload",
+        () => {
+
+            /*
+             * Stop the camera when leaving the page.
+             */
+
+            stopCamera();
+
+
+            /*
+             * Remove image references.
+             *
+             * No localStorage/sessionStorage is used.
+             */
+
+            medicationImage = null;
+            labelImage = null;
+
+        }
+    );
+
+
+    /* =====================================================
+       INITIALIZE
+       ===================================================== */
+
+    startCamera();
 
 </script>
 
