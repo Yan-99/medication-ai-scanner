@@ -3,15 +3,15 @@ import base64
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
-# By moving 'templates' inside the 'api' folder, Flask finds it automatically
-app = Flask(__name__)
+# Find the templates folder relative to this script's directory in the cloud
+current_dir = os.path.dirname(os.path.abspath(__file__))
+template_dir = os.path.join(current_dir, 'templates')
 
-def get_openai_client():
-    """Safely initializes the OpenAI client when a request is made."""
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY environment variable is missing on Vercel dashboard.")
-    return OpenAI(api_key=api_key.strip())
+app = Flask(__name__, template_folder=template_dir)
+
+# Initialize OpenAI client safely 
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 @app.route('/')
 def home():
@@ -24,7 +24,7 @@ def verify_medication():
         return jsonify({'error': 'Both images are required'}), 400
 
     try:
-        # Securely parse base64 image streams 
+        # Split out the base64 data stream cleanly
         med_image_data = data['medImage'].split(',')[1]
         label_image_data = data['labelImage'].split(',')[1]
     except IndexError:
@@ -42,7 +42,6 @@ def verify_medication():
     )
 
     try:
-        client = get_openai_client()
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -61,6 +60,6 @@ def verify_medication():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Expose global app handler mapping for Vercel
+# Expose app for Vercel WSGI
 app.debug = True
 handler = app
