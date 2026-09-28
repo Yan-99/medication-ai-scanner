@@ -3,12 +3,15 @@ import base64
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
-app = Flask(__name__, template_folder='../templates')
+# By moving 'templates' inside the 'api' folder, Flask finds it automatically
+app = Flask(__name__)
 
-# For cloud hosting like Vercel, we read the key from the system environment
-# You will paste this key securely into the Vercel Dashboard settings later!
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-client = OpenAI(api_key=OPENAI_API_KEY)
+def get_openai_client():
+    """Safely initializes the OpenAI client when a request is made."""
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY environment variable is missing on Vercel dashboard.")
+    return OpenAI(api_key=api_key.strip())
 
 @app.route('/')
 def home():
@@ -20,8 +23,12 @@ def verify_medication():
     if not data or 'medImage' not in data or 'labelImage' not in data:
         return jsonify({'error': 'Both images are required'}), 400
 
-    med_image_data = data['medImage'].split(',')[1]
-    label_image_data = data['labelImage'].split(',')[1]
+    try:
+        # Securely parse base64 image streams 
+        med_image_data = data['medImage'].split(',')[1]
+        label_image_data = data['labelImage'].split(',')[1]
+    except IndexError:
+        return jsonify({'error': 'Invalid image format received'}), 400
 
     prompt = (
         "You are a strict medical safety assistant. You have been provided two images.\n"
@@ -35,6 +42,7 @@ def verify_medication():
     )
 
     try:
+        client = get_openai_client()
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -53,6 +61,6 @@ def verify_medication():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Required for Vercel serverless execution
+# Expose global app handler mapping for Vercel
 app.debug = True
 handler = app
