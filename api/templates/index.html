@@ -811,7 +811,18 @@
           outputText.className = "";
 
           if (data.result) {
-            outputText.innerText = data.result;
+            const result = data.result;
+
+            const matchText = result.match ? "MATCH" : "DO NOT MATCH";
+
+            outputText.innerText =
+              `Verification Result: ${matchText}\n\n` +
+              `Medication: ${result.medication_name}\n` +
+              `Strength: ${result.medication_strength}\n\n` +
+              `Prescription Label: ${result.label_name}\n` +
+              `Strength: ${result.label_strength}\n\n` +
+              `Confidence: ${result.confidence}\n\n` +
+              `Reason: ${result.reason}`;
           } else if (data.error) {
             outputText.className = "error";
 
