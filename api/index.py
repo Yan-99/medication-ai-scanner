@@ -242,6 +242,11 @@ Do not include any text outside the JSON object.
         except Exception as db_error:
 
             # Print the detailed error to Vercel logs
+
+            print(
+                "Supabase database error type:",
+                type(db_error).__name__
+    )
             print(
                 "Supabase database error:",
                 str(db_error)
