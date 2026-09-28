@@ -55,3 +55,4 @@ def verify_medication():
 
 # Required for Vercel serverless execution
 app.debug = True
+handler = app
