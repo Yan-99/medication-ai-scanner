@@ -1,86 +1,458 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Medication Scanner</title>
+
     <style>
-        body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; text-align: center; background: #f5f5f7; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        video { width: 100%; border-radius: 8px; background: #000; transform: scaleX(-1); } /* Mirror mode */
-        button { background: #0071e3; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; }
-        button:hover { background: #0077ed; }
-        #result-box { margin-top: 25px; padding: 15px; border-radius: 8px; background: #e8e8ed; text-align: left; white-space: pre-line; display: none; }
-        .loading { color: #666; font-style: italic; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            text-align: center;
+            background: #f5f5f7;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        video {
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+            transform: scaleX(-1);
+        }
+
+        button {
+            background: #0071e3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0077ed;
+        }
+
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        #instruction {
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        #status {
+            margin-top: 10px;
+            color: #666;
+        }
+
+        #result-box {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e8e8ed;
+            text-align: left;
+            white-space: pre-line;
+            display: none;
+        }
+
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+
+        .success {
+            color: #16803c;
+        }
+
+        .error {
+            color: #c62828;
+        }
+
+        .preview-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .preview-container img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .retake-btn {
+            background: #666;
+            margin-top: 10px;
+        }
+
+        .retake-btn:hover {
+            background: #555;
+        }
     </style>
 </head>
+
 <body>
 
 <div class="container">
-    <h2>Medication Verification Scanner</h2>
-    <p>Hold up your medication box and label, then click verify.</p>
-    
-    <!-- Live webcam video container -->
-    <video id="webcam" autoplay playsinline></video>
-    <br>
-    <button id="capture-btn">Scan & Verify Match</button>
 
+    <h2>Medication Verification Scanner</h2>
+
+    <p>
+        Capture the medication packaging and prescription label
+        to check whether they match.
+    </p>
+
+    <!-- Current step -->
+    <div id="instruction">
+        Step 1: Capture the medication box or bottle
+    </div>
+
+    <!-- Camera -->
+    <video id="webcam" autoplay playsinline></video>
+
+    <!-- Capture button -->
+    <button id="capture-btn">
+        Capture Medication
+    </button>
+
+    <!-- Preview of captured image -->
+    <div id="med-preview-container" class="preview-container">
+        <p><strong>Medication image captured</strong></p>
+        <img id="med-preview" alt="Medication preview">
+    </div>
+
+    <div id="label-preview-container" class="preview-container">
+        <p><strong>Prescription label captured</strong></p>
+        <img id="label-preview" alt="Prescription label preview">
+    </div>
+
+    <!-- Retake button -->
+    <button id="retake-btn" class="retake-btn" style="display:none;">
+        Retake
+    </button>
+
+    <!-- Result -->
     <div id="result-box">
         <h3>Verification Result:</h3>
         <p id="output-text"></p>
     </div>
+
+    <div id="status"></div>
+
 </div>
 
 <script>
+
     const video = document.getElementById('webcam');
-    const button = document.getElementById('capture-btn');
+    const captureButton = document.getElementById('capture-btn');
+    const retakeButton = document.getElementById('retake-btn');
+
+    const instruction = document.getElementById('instruction');
+    const status = document.getElementById('status');
+
     const resultBox = document.getElementById('result-box');
     const outputText = document.getElementById('output-text');
 
-    // 1. Request access to the user's laptop camera
-    navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } })
-        .then(stream => { video.srcObject = stream; })
-        .catch(err => { alert("Error accessing webcam: " + err); });
+    const medPreviewContainer =
+        document.getElementById('med-preview-container');
 
-    // 2. Capture a frame and send it to the Python backend when clicked
-    button.addEventListener('click', () => {
-        // Create an invisible canvas element to grab the frame
+    const labelPreviewContainer =
+        document.getElementById('label-preview-container');
+
+    const medPreview =
+        document.getElementById('med-preview');
+
+    const labelPreview =
+        document.getElementById('label-preview');
+
+
+    // Store images temporarily in JavaScript memory only.
+    let medicationImage = null;
+    let labelImage = null;
+
+    // Track which image we are currently capturing.
+    let currentStep = 'medication';
+
+
+    // --------------------------------------------------
+    // 1. Start camera
+    // --------------------------------------------------
+
+    let cameraStream = null;
+
+    navigator.mediaDevices.getUserMedia({
+        video: {
+            width: 1280,
+            height: 720
+        }
+    })
+    .then(stream => {
+        cameraStream = stream;
+        video.srcObject = stream;
+    })
+    .catch(err => {
+        console.error(err);
+        status.innerText =
+            "Unable to access the camera. Please check your browser permissions.";
+        status.className = "error";
+    });
+
+
+    // --------------------------------------------------
+    // 2. Capture image
+    // --------------------------------------------------
+
+    captureButton.addEventListener('click', () => {
+
         const canvas = document.createElement('canvas');
+
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
+
         const ctx = canvas.getContext('2d');
-        
-        // Draw the current video frame onto the canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Convert the canvas image to a base64 Data URL string
-        const imageDataUrl = canvas.toDataURL('image/jpeg');
 
-        // Show loading status
-        resultBox.style.display = 'block';
-        outputText.className = 'loading';
-        outputText.innerText = 'AI is analyzing your scan... please hold still.';
+        // Capture current camera frame
+        ctx.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
 
-        // Send data to the Flask Python server via an HTTP POST request
-        fetch('/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ image: imageDataUrl })
-        })
-        .then(res => res.json())
-        .then(data => {
-            outputText.className = '';
-            if (data.result) {
-                outputText.innerText = data.result;
-            } else if (data.error) {
-                outputText.innerText = "Error: " + data.error;
-            }
-        })
-        .catch(err => {
-            outputText.className = '';
-            outputText.innerText = "Network error connecting to backend.";
-        });
+        // Convert image to JPEG Base64
+        const imageDataUrl = canvas.toDataURL(
+            'image/jpeg',
+            0.85
+        );
+
+
+        // ----------------------------------------------
+        // Step 1: Medication
+        // ----------------------------------------------
+
+        if (currentStep === 'medication') {
+
+            medicationImage = imageDataUrl;
+
+            // Show preview
+            medPreview.src = medicationImage;
+            medPreviewContainer.style.display = 'block';
+
+            // Move to step 2
+            currentStep = 'label';
+
+            instruction.innerText =
+                "Step 2: Hold up the prescription or cartfill label";
+
+            captureButton.innerText =
+                "Capture Prescription Label";
+
+            retakeButton.style.display = 'inline-block';
+
+            status.innerText =
+                "Medication captured. Now capture the prescription label.";
+
+            return;
+        }
+
+
+        // ----------------------------------------------
+        // Step 2: Prescription label
+        // ----------------------------------------------
+
+        if (currentStep === 'label') {
+
+            labelImage = imageDataUrl;
+
+            // Show preview
+            labelPreview.src = labelImage;
+            labelPreviewContainer.style.display = 'block';
+
+            captureButton.disabled = true;
+            retakeButton.style.display = 'inline-block';
+
+            instruction.innerText =
+                "Both images captured";
+
+            status.innerText =
+                "Sending both images for AI verification...";
+
+            verifyImages();
+        }
+
     });
+
+
+    // --------------------------------------------------
+    // 3. Send both images to Flask
+    // --------------------------------------------------
+
+    function verifyImages() {
+
+        if (!medicationImage || !labelImage) {
+
+            outputText.innerText =
+                "Both images are required.";
+
+            resultBox.style.display = 'block';
+
+            return;
+        }
+
+
+        resultBox.style.display = 'block';
+
+        outputText.className = 'loading';
+
+        outputText.innerText =
+            'AI is analyzing the medication and prescription label...';
+
+
+        fetch('/verify', {
+
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+
+                // These names MUST match Flask
+                medImage: medicationImage,
+                labelImage: labelImage
+
+            })
+
+        })
+
+        .then(async response => {
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.error || 'Verification failed.'
+                );
+            }
+
+            return data;
+
+        })
+
+        .then(data => {
+
+            outputText.className = '';
+
+            if (data.result) {
+
+                outputText.innerText = data.result;
+
+                status.innerText =
+                    "Verification completed.";
+
+                status.className = "success";
+
+            } else if (data.error) {
+
+                outputText.innerText =
+                    "Error: " + data.error;
+
+                status.className = "error";
+            }
+
+        })
+
+        .catch(err => {
+
+            console.error(err);
+
+            outputText.className = 'error';
+
+            outputText.innerText =
+                "Error: " + err.message;
+
+            status.innerText =
+                "Unable to complete verification.";
+
+            status.className = "error";
+
+        });
+
+    }
+
+
+    // --------------------------------------------------
+    // 4. Retake
+    // --------------------------------------------------
+
+    retakeButton.addEventListener('click', () => {
+
+        medicationImage = null;
+        labelImage = null;
+
+        currentStep = 'medication';
+
+        medPreview.src = '';
+        labelPreview.src = '';
+
+        medPreviewContainer.style.display = 'none';
+        labelPreviewContainer.style.display = 'none';
+
+        captureButton.disabled = false;
+
+        captureButton.innerText =
+            "Capture Medication";
+
+        retakeButton.style.display = 'none';
+
+        instruction.innerText =
+            "Step 1: Capture the medication box or bottle";
+
+        status.innerText =
+            "Ready for a new scan.";
+
+        resultBox.style.display = 'none';
+
+        outputText.innerText = '';
+
+    });
+
+
+    // --------------------------------------------------
+    // 5. Stop camera when leaving page
+    // --------------------------------------------------
+
+    window.addEventListener('beforeunload', () => {
+
+        if (cameraStream) {
+
+            cameraStream
+                .getTracks()
+                .forEach(track => track.stop());
+
+        }
+
+    });
+
 </script>
 
 </body>
