@@ -730,7 +730,7 @@
 
           <a href="/qr" class="nav-btn"> 📱 QR Verify </a>
 
-          <a href="/?view=history" class="nav-btn"> 📋 Scan History </a>
+          <a href="/history" class="nav-btn"> 📋 Scan History </a>
         </div>
       </div>
 
@@ -1647,6 +1647,12 @@
         loadScanHistory();
       });
 
+      const urlParams = new URLSearchParams(window.location.search);
+
+      if (urlParams.get("view") === "history") {
+        showHistoryBtn.click();
+      }
+
       /* =====================================================
          RETURN TO VERIFICATION
          ===================================================== */
@@ -2073,6 +2079,16 @@
        */
 
       stopCamera();
+
+      // ==========================================================
+      // OPEN HISTORY FROM URL
+      // ==========================================================
+
+      const urlParams = new URLSearchParams(window.location.search);
+
+      if (urlParams.get("view") === "history") {
+        showHistoryScreen();
+      }
     </script>
   </body>
 </html>
