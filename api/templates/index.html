@@ -1,1358 +1,1541 @@
 <!doctype html>
 
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Medication Verification</title>
 
-    <title>AI Medication Verification</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-    <style>
-      * {
-        box-sizing: border-box;
-      }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f7;
+      color: #1d1d1f;
+    }
 
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
 
-        max-width: 850px;
-        margin: 0 auto;
-        padding: 20px;
+    /* =====================================================
+       HEADER
+       ===================================================== */
 
-        background: #f5f5f7;
-        color: #1d1d1f;
-      }
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
 
-      .container {
-        background: white;
-        padding: 25px;
-        border-radius: 16px;
+    .app-header-text {
+      flex: 1;
+    }
 
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      }
+    h1 {
+      font-size: 26px;
+      margin: 0 0 8px 0;
+    }
 
-      /* =====================================================
-         HEADER
-         ===================================================== */
+    .subtitle {
+      color: #666;
+      margin: 0;
+      line-height: 1.5;
+    }
 
-      .app-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 20px;
+    /* =====================================================
+       TOP NAVIGATION
+       ===================================================== */
 
-        margin-bottom: 20px;
-      }
+    .top-navigation {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
 
-      .app-header-text {
-        flex: 1;
-      }
+    .nav-btn {
+      flex: 1;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      background: #e5e7eb;
+      color: #111827;
+      border-radius: 8px;
+      padding: 11px 10px;
+      font-size: 14px;
+      font-weight: 600;
+      transition:
+        background 0.15s ease,
+        color 0.15s ease;
+      border: none;
+      cursor: pointer;
+      margin-top: 0;
+      width: auto;
+    }
 
-      h1 {
-        font-size: 26px;
-        margin: 0 0 8px 0;
-      }
+    .nav-btn:hover {
+      background: #d1d5db;
+      opacity: 1;
+    }
 
-      .subtitle {
-        color: #666;
-        margin: 0;
-        line-height: 1.5;
-      }
+    .nav-btn.active {
+      background: #2563eb;
+      color: white;
+    }
 
-      /* =====================================================
-         TOP NAVIGATION
-         ===================================================== */
-
+    @media (max-width: 520px) {
       .top-navigation {
-        display: flex;
-        gap: 8px;
-        margin-top: 16px;
-      }
-
-      .nav-btn {
-        flex: 1;
-        display: block;
-        text-align: center;
-        text-decoration: none;
-        background: #e5e7eb;
-        color: #111827;
-        border-radius: 8px;
-        padding: 11px 10px;
-        font-size: 14px;
-        font-weight: 600;
-        transition:
-          background 0.15s ease,
-          color 0.15s ease;
-      }
-
-      .nav-btn:hover {
-        background: #d1d5db;
-      }
-
-      .nav-btn.active {
-        background: #2563eb;
-        color: white;
-      }
-
-      @media (max-width: 520px) {
-        .top-navigation {
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .nav-btn {
-          padding: 12px 10px;
-        }
-      }
-
-      .history-nav-btn {
-        width: auto;
-        margin-top: 0;
-        padding: 10px 14px;
-
-        background: #e8e8ed;
-        color: #1d1d1f;
-
-        white-space: nowrap;
-      }
-
-      /* =====================================================
-         STEPS
-         ===================================================== */
-
-      .step {
-        display: none;
-      }
-
-      .step.active {
-        display: block;
-      }
-
-      .step-title {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .step-description {
-        color: #666;
-        margin-bottom: 15px;
-        line-height: 1.5;
-      }
-
-      /* =====================================================
-         STEP INDICATOR
-         ===================================================== */
-
-      .step-indicator {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 25px;
-      }
-
-      .indicator {
-        flex: 1;
-        height: 5px;
-        border-radius: 5px;
-        background: #ddd;
-      }
-
-      .indicator.active {
-        background: #0071e3;
-      }
-
-      /* =====================================================
-         STAFF ID
-         ===================================================== */
-
-      #staff-id-screen label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      #staff-id {
-        width: 100%;
-        padding: 14px;
-
-        border: 1px solid #ccc;
-        border-radius: 10px;
-
-        font-size: 16px;
-
-        margin-bottom: 5px;
-
-        outline: none;
-      }
-
-      #staff-id:focus {
-        border-color: #0071e3;
-
-        box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
-      }
-
-      /* =====================================================
-         BUTTONS
-         ===================================================== */
-
-      button {
-        width: 100%;
-
-        border: none;
-        border-radius: 10px;
-
-        padding: 14px 18px;
-        margin-top: 12px;
-
-        font-size: 16px;
-        font-weight: 600;
-
-        cursor: pointer;
-
-        transition:
-          opacity 0.2s,
-          background 0.2s;
-      }
-
-      button:hover {
-        opacity: 0.9;
-      }
-
-      button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .primary-btn {
-        background: #0071e3;
-        color: white;
-      }
-
-      .secondary-btn {
-        background: #e8e8ed;
-        color: #1d1d1f;
-      }
-
-      .reset-btn {
-        background: #f2f2f2;
-        color: #333;
-      }
-
-      .verify-btn {
-        background: #34a853;
-        color: white;
-      }
-
-      /* =====================================================
-         CAMERA
-         ===================================================== */
-
-      .camera-container {
-        position: relative;
-
-        width: 100%;
-
-        overflow: hidden;
-
-        border-radius: 12px;
-
-        background: #000;
-      }
-
-      video {
-        width: 100%;
-
-        display: block;
-
-        border-radius: 12px;
-
-        background: #000;
-      }
-
-      /*
-       * The camera is NOT mirrored.
-       * This is intentional because we use the rear camera.
-       */
-
-      #camera-status,
-      #camera-status-step-2 {
-        margin-top: 10px;
-
-        font-size: 14px;
-
-        color: #666;
-
-        text-align: center;
-      }
-
-      /* =====================================================
-         PREVIEWS
-         ===================================================== */
-
-      .preview-container {
-        margin-top: 20px;
-      }
-
-      .preview-container h3 {
-        font-size: 16px;
-
-        margin-bottom: 10px;
-      }
-
-      .preview {
-        width: 100%;
-
-        border-radius: 10px;
-
-        display: block;
-
-        background: #f2f2f2;
-      }
-
-      /* =====================================================
-         RESULT
-         ===================================================== */
-
-      #result-box {
-        display: none;
-
-        margin-top: 25px;
-
-        padding: 18px;
-
-        border-radius: 12px;
-
-        background: #f0f0f5;
-
-        text-align: left;
-      }
-
-      #result-box h3 {
-        margin-top: 0;
-      }
-
-      #output-text {
-        white-space: pre-line;
-
-        line-height: 1.5;
-      }
-
-      .loading {
-        color: #666;
-
-        font-style: italic;
-      }
-
-      .error {
-        color: #c00;
-      }
-
-      /* =====================================================
-         PRIVACY
-         ===================================================== */
-
-      .privacy-note {
-        margin-top: 20px;
-
-        padding: 12px;
-
-        background: #f7f7f7;
-
-        border-radius: 8px;
-
-        font-size: 13px;
-
-        color: #666;
-
-        line-height: 1.4;
-      }
-
-      /* =====================================================
-         SCAN HISTORY
-         ===================================================== */
-
-      #scan-history-screen {
-        display: none;
-      }
-
-      #scan-history-screen.active {
-        display: block;
-      }
-
-      .history-header {
-        display: flex;
-
-        justify-content: space-between;
-
-        align-items: flex-start;
-
-        gap: 20px;
-
-        margin-bottom: 25px;
-      }
-
-      .history-header h2 {
-        margin: 0 0 6px 0;
-
-        font-size: 24px;
-      }
-
-      .history-description {
-        margin: 0;
-
-        color: #666;
-
-        line-height: 1.5;
-      }
-
-      .history-back-btn {
-        width: auto;
-
-        margin-top: 0;
-
-        white-space: nowrap;
-      }
-
-      /* =====================================================
-         HISTORY FILTERS
-         ===================================================== */
-
-      .history-filters {
-        display: flex;
-
-        gap: 15px;
-
-        margin-bottom: 20px;
-      }
-
-      .history-search,
-      .history-result-filter {
-        display: flex;
-
         flex-direction: column;
-
         gap: 6px;
       }
 
-      .history-search {
-        flex: 1;
-      }
-
-      .history-filters label {
-        font-size: 13px;
-
-        font-weight: 600;
-      }
-
-      .history-filters input,
-      .history-filters select {
+      .nav-btn {
+        padding: 12px 10px;
         width: 100%;
+      }
+    }
 
-        padding: 10px 12px;
+    /* =====================================================
+       STEPS
+       ===================================================== */
 
-        border: 1px solid #ccc;
+    .step {
+      display: none;
+    }
 
-        border-radius: 8px;
+    .step.active {
+      display: block;
+    }
 
-        font-size: 14px;
+    .step-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
 
-        background: white;
+    .step-description {
+      color: #666;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
 
-        outline: none;
+    /* =====================================================
+       STEP INDICATOR
+       ===================================================== */
+
+    .step-indicator {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 25px;
+    }
+
+    .indicator {
+      flex: 1;
+      height: 5px;
+      border-radius: 5px;
+      background: #ddd;
+    }
+
+    .indicator.active {
+      background: #0071e3;
+    }
+
+    /* =====================================================
+       STAFF ID
+       ===================================================== */
+
+    #staff-id-screen label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    #staff-id {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 5px;
+      outline: none;
+    }
+
+    #staff-id:focus {
+      border-color: #0071e3;
+      box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
+    }
+
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        opacity 0.2s,
+        background 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .primary-btn {
+      background: #0071e3;
+      color: white;
+    }
+
+    .secondary-btn {
+      background: #e8e8ed;
+      color: #1d1d1f;
+    }
+
+    .reset-btn {
+      background: #f2f2f2;
+      color: #333;
+    }
+
+    .verify-btn {
+      background: #34a853;
+      color: white;
+    }
+
+    /* =====================================================
+       CAMERA
+       ===================================================== */
+
+    .camera-container {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    #camera-status,
+    #camera-status-step-2 {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+
+    /* =====================================================
+       PREVIEWS
+       ===================================================== */
+
+    .preview-container {
+      margin-top: 20px;
+    }
+
+    .preview-container h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .preview {
+      width: 100%;
+      border-radius: 10px;
+      display: block;
+      background: #f2f2f2;
+    }
+
+    /* =====================================================
+       RESULT
+       ===================================================== */
+
+    #result-box {
+      display: none;
+      margin-top: 25px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #f0f0f5;
+      text-align: left;
+    }
+
+    #result-box h3 {
+      margin-top: 0;
+    }
+
+    #output-text {
+      white-space: pre-line;
+      line-height: 1.5;
+    }
+
+    .loading {
+      color: #666;
+      font-style: italic;
+    }
+
+    .error {
+      color: #c00;
+    }
+
+    /* =====================================================
+       PRIVACY
+       ===================================================== */
+
+    .privacy-note {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f7f7f7;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* =====================================================
+       SCAN HISTORY
+       ===================================================== */
+
+    #scan-history-screen {
+      display: none;
+    }
+
+    #scan-history-screen.active {
+      display: block;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .history-header h2 {
+      margin: 0 0 6px 0;
+      font-size: 24px;
+    }
+
+    .history-description {
+      margin: 0;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .history-back-btn {
+      width: auto;
+      margin-top: 0;
+      white-space: nowrap;
+    }
+
+    /* =====================================================
+       HISTORY FILTERS
+       ===================================================== */
+
+    .history-filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .history-search,
+    .history-result-filter {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-search {
+      flex: 1;
+    }
+
+    .history-filters label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .history-filters input,
+    .history-filters select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      outline: none;
+    }
+
+    .history-filters input:focus,
+    .history-filters select:focus {
+      border-color: #0071e3;
+      box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.1);
+    }
+
+    /* =====================================================
+       HISTORY TABLE
+       ===================================================== */
+
+    .history-table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+    }
+
+    #history-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+    }
+
+    #history-table th {
+      text-align: left;
+      padding: 12px;
+      background: #f5f5f5;
+      font-size: 13px;
+      font-weight: 600;
+      border-bottom: 1px solid #ddd;
+      white-space: nowrap;
+    }
+
+    #history-table td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    #history-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    #history-table tbody tr:hover {
+      background: #fafafa;
+    }
+
+    /* =====================================================
+       RESULT BADGES
+       ===================================================== */
+
+    .result-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .result-match {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .result-no-match {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    /* =====================================================
+       CONFIDENCE
+       ===================================================== */
+
+    .confidence-text {
+      text-transform: capitalize;
+    }
+
+    /* =====================================================
+       DETAILS BUTTON
+       ===================================================== */
+
+    .details-btn {
+      width: auto;
+      margin: 0;
+      padding: 7px 10px;
+      background: #e8e8ed;
+      color: #1d1d1f;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* =====================================================
+       HISTORY MESSAGES
+       ===================================================== */
+
+    .history-message {
+      padding: 25px;
+      text-align: center;
+      color: #666;
+    }
+
+    .history-message.error {
+      color: #c00;
+    }
+
+    /* =====================================================
+       HISTORY DETAILS
+       ===================================================== */
+
+    #history-detail-box {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 12px;
+      background: #f0f0f5;
+      border: 1px solid #e0e0e0;
+    }
+
+    #history-detail-box h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    .detail-row {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+      line-height: 1.5;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      min-width: 150px;
+      font-weight: 600;
+    }
+
+    .detail-value {
+      flex: 1;
+    }
+
+    .close-detail-btn {
+      width: auto;
+      padding: 9px 14px;
+      margin-top: 15px;
+    }
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
       }
 
-      .history-filters input:focus,
-      .history-filters select:focus {
-        border-color: #0071e3;
-
-        box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.1);
-      }
-
-      /* =====================================================
-         HISTORY TABLE
-         ===================================================== */
-
-      .history-table-container {
-        width: 100%;
-
-        overflow-x: auto;
-
-        border: 1px solid #e0e0e0;
-
-        border-radius: 10px;
-      }
-
-      #history-table {
-        width: 100%;
-
-        border-collapse: collapse;
-
-        min-width: 850px;
-      }
-
-      #history-table th {
-        text-align: left;
-
-        padding: 12px;
-
-        background: #f5f5f5;
-
-        font-size: 13px;
-
-        font-weight: 600;
-
-        border-bottom: 1px solid #ddd;
-
-        white-space: nowrap;
-      }
-
-      #history-table td {
-        padding: 12px;
-
-        border-bottom: 1px solid #eee;
-
-        font-size: 14px;
-
-        vertical-align: middle;
-      }
-
-      #history-table tbody tr:last-child td {
-        border-bottom: none;
-      }
-
-      #history-table tbody tr:hover {
-        background: #fafafa;
-      }
-
-      /* =====================================================
-         RESULT BADGES
-         ===================================================== */
-
-      .result-badge {
-        display: inline-block;
-
-        padding: 5px 9px;
-
-        border-radius: 6px;
-
-        font-size: 12px;
-
-        font-weight: 600;
-
-        white-space: nowrap;
-      }
-
-      .result-match {
-        background: #e8f5e9;
-
-        color: #2e7d32;
-      }
-
-      .result-no-match {
-        background: #ffebee;
-
-        color: #c62828;
-      }
-
-      /* =====================================================
-         CONFIDENCE
-         ===================================================== */
-
-      .confidence-text {
-        text-transform: capitalize;
-      }
-
-      /* =====================================================
-         DETAILS BUTTON
-         ===================================================== */
-
-      .details-btn {
-        width: auto;
-
-        margin: 0;
-
-        padding: 7px 10px;
-
-        background: #e8e8ed;
-
-        color: #1d1d1f;
-
-        font-size: 13px;
-
-        font-weight: 500;
-      }
-
-      /* =====================================================
-         HISTORY MESSAGES
-         ===================================================== */
-
-      .history-message {
-        padding: 25px;
-
-        text-align: center;
-
-        color: #666;
-      }
-
-      .history-message.error {
-        color: #c00;
-      }
-
-      /* =====================================================
-         HISTORY DETAILS
-         ===================================================== */
-
-      #history-detail-box {
-        display: none;
-
-        margin-top: 20px;
-
+      .container {
         padding: 18px;
-
         border-radius: 12px;
-
-        background: #f0f0f5;
-
-        border: 1px solid #e0e0e0;
       }
 
-      #history-detail-box h3 {
-        margin-top: 0;
+      .app-header {
+        flex-direction: column;
+      }
 
-        margin-bottom: 15px;
+      .top-navigation {
+        width: 100%;
+      }
+
+      .history-header {
+        flex-direction: column;
+      }
+
+      .history-back-btn {
+        width: 100%;
+      }
+
+      .history-filters {
+        flex-direction: column;
       }
 
       .detail-row {
-        display: flex;
-
-        gap: 10px;
-
-        padding: 8px 0;
-
-        border-bottom: 1px solid #ddd;
-
-        line-height: 1.5;
-      }
-
-      .detail-row:last-child {
-        border-bottom: none;
+        flex-direction: column;
+        gap: 2px;
       }
 
       .detail-label {
-        min-width: 150px;
-
-        font-weight: 600;
+        min-width: auto;
       }
+    }
+  </style>
 
-      .detail-value {
-        flex: 1;
-      }
+</head>
 
-      .close-detail-btn {
-        width: auto;
+<body>
 
-        padding: 9px 14px;
+  <div class="container">
 
-        margin-top: 15px;
-      }
+```
+<!-- =====================================================
+     APPLICATION HEADER
+     ===================================================== -->
 
-      /* =====================================================
-         MOBILE
-         ===================================================== */
+<div class="app-header">
 
-      @media (max-width: 600px) {
-        body {
-          padding: 10px;
-        }
+  <div class="app-header-text">
+    <h1>AI Medication Verification</h1>
 
-        .container {
-          padding: 18px;
+    <p class="subtitle">
+      Capture the medication packaging and prescription label to verify
+      that they match.
+    </p>
+  </div>
 
-          border-radius: 12px;
-        }
+  <div class="top-navigation">
 
-        .app-header {
-          flex-direction: column;
-        }
+    <a href="/" id="ai-nav-btn" class="nav-btn active">
+      🤖 AI Verify
+    </a>
 
-        .top-navigation {
-          width: 100%;
-        }
+    <a href="/qr" id="qr-nav-btn" class="nav-btn">
+      📱 QR Verify
+    </a>
 
-        .history-nav-btn {
-          width: 100%;
-        }
+    <button
+      id="show-history-btn"
+      class="nav-btn"
+      type="button"
+    >
+      📋 Scan History
+    </button>
 
-        .history-header {
-          flex-direction: column;
-        }
+  </div>
 
-        .history-back-btn {
-          width: 100%;
-        }
+</div>
 
-        .history-filters {
-          flex-direction: column;
-        }
 
-        .detail-row {
-          flex-direction: column;
+<!-- =====================================================
+     VERIFICATION INTERFACE
+     ===================================================== -->
 
-          gap: 2px;
-        }
+<div id="verification-interface">
 
-        .detail-label {
-          min-width: auto;
-        }
-      }
-    </style>
-  </head>
+  <!-- Step indicator -->
 
-  <body>
-    <div class="container">
-      <!-- =====================================================
-           APPLICATION HEADER
-           ===================================================== -->
+  <div class="step-indicator">
 
-      <div class="app-header">
-        <div class="app-header-text">
-          <h1>AI Medication Verification</h1>
+    <div id="indicator-1" class="indicator active"></div>
+    <div id="indicator-2" class="indicator"></div>
 
-          <p class="subtitle">
-            Capture the medication packaging and prescription label to verify
-            that they match.
-          </p>
-        </div>
+  </div>
 
-        <div class="top-navigation">
-          <a href="/" class="nav-btn active"> 🤖 AI Verify </a>
 
-          <a href="/qr" class="nav-btn"> 📱 QR Verify </a>
+  <!-- ===================================================
+       STAFF ID SCREEN
+       =================================================== -->
 
-          <a href="/?view=history" id="show-history-btn" class="nav-btn"> 📋 Scan History </a>
-        </div>
-      </div>
+  <div id="staff-id-screen" class="step active">
 
-      <!-- =====================================================
-           VERIFICATION INTERFACE
-           ===================================================== -->
-
-      <div id="verification-interface">
-        <!-- Step indicator -->
-
-        <div class="step-indicator">
-          <div id="indicator-1" class="indicator active"></div>
-
-          <div id="indicator-2" class="indicator"></div>
-        </div>
-
-        <!-- ===================================================
-             STAFF ID SCREEN
-             =================================================== -->
-
-        <div id="staff-id-screen" class="step active">
-          <div class="step-title">Staff Identification</div>
-
-          <div class="step-description">
-            Please enter your Staff ID before starting medication verification.
-          </div>
-
-          <label for="staff-id"> Staff ID </label>
-
-          <input
-            type="text"
-            id="staff-id"
-            placeholder="Enter your Staff ID"
-            autocomplete="off"
-            maxlength="30"
-          />
-
-          <button id="start-verification-btn" class="primary-btn">
-            Start Verification
-          </button>
-
-          <div
-            id="staff-id-error"
-            class="error"
-            style="display: none; margin-top: 10px"
-          >
-            Please enter your Staff ID.
-          </div>
-        </div>
-
-        <!-- ===================================================
-             STEP 1 — MEDICATION
-             =================================================== -->
-
-        <div id="step-1" class="step">
-          <div class="step-title">Step 1: Capture Medication</div>
-
-          <div class="step-description">
-            Position the medication box or bottle clearly inside the camera
-            view.
-          </div>
-
-          <div class="camera-container">
-            <video id="webcam" autoplay playsinline></video>
-          </div>
-
-          <div id="camera-status">Camera is off.</div>
-
-          <button id="capture-medication-btn" class="primary-btn" disabled>
-            📷 Capture Medication
-          </button>
-
-          <button id="stop-camera-btn" class="secondary-btn">
-            📷 Start Camera
-          </button>
-        </div>
-
-        <!-- ===================================================
-             STEP 2 — LABEL
-             =================================================== -->
-
-        <div id="step-2" class="step">
-          <div class="step-title">Step 2: Capture Prescription Label</div>
-
-          <div class="step-description">
-            Position the prescription or cartfill label clearly inside the
-            camera view.
-          </div>
-
-          <div class="camera-container">
-            <video id="webcam-step-2" autoplay playsinline></video>
-          </div>
-
-          <div id="camera-status-step-2">Camera is off.</div>
-
-          <button id="capture-label-btn" class="primary-btn" disabled>
-            📷 Capture Prescription Label
-          </button>
-
-          <button id="stop-camera-btn-step-2" class="secondary-btn">
-            📷 Start Camera
-          </button>
-        </div>
-
-        <!-- ===================================================
-             PREVIEWS
-             =================================================== -->
-
-        <div
-          id="medication-preview-container"
-          class="preview-container"
-          style="display: none"
-        >
-          <h3>Medication Image</h3>
-
-          <img
-            id="medication-preview"
-            class="preview"
-            alt="Captured medication"
-          />
-        </div>
-
-        <div
-          id="label-preview-container"
-          class="preview-container"
-          style="display: none"
-        >
-          <h3>Prescription Label Image</h3>
-
-          <img
-            id="label-preview"
-            class="preview"
-            alt="Captured prescription label"
-          />
-        </div>
-
-        <!-- ===================================================
-             VERIFY
-             =================================================== -->
-
-        <button id="verify-btn" class="verify-btn" style="display: none">
-          🔍 Scan & Verify Match
-        </button>
-
-        <!-- ===================================================
-             RESET
-             =================================================== -->
-
-        <button id="reset-btn" class="reset-btn">
-          ↻ Start New Verification
-        </button>
-
-        <!-- ===================================================
-             RESULT
-             =================================================== -->
-
-        <div id="result-box">
-          <h3>Verification Result</h3>
-
-          <p id="output-text"></p>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           SCAN HISTORY
-           ===================================================== -->
-
-      <div id="scan-history-screen">
-        <div class="history-header">
-          <div>
-            <h2>Scan History</h2>
-
-            <p class="history-description">
-              View previous medication verification records.
-            </p>
-          </div>
-
-          <button
-            id="back-to-verification-btn"
-            class="secondary-btn history-back-btn"
-          >
-            ← New Verification
-          </button>
-        </div>
-
-        <!-- ===================================================
-             FILTERS
-             =================================================== -->
-
-        <div class="history-filters">
-          <div class="history-search">
-            <label for="history-search"> Search </label>
-
-            <input
-              type="text"
-              id="history-search"
-              placeholder="Search Staff ID or medication"
-              autocomplete="off"
-            />
-          </div>
-
-          <div class="history-result-filter">
-            <div class="history-type-filter">
-              <label for="history-type-filter"> Verification Type </label>
-
-              <select id="history-type-filter">
-                <option value="all">All</option>
-
-                <option value="AI">🤖 AI</option>
-
-                <option value="QR">📱 QR</option>
-              </select>
-            </div>
-
-            <label for="history-result-filter"> Result </label>
-
-            <select id="history-result-filter">
-              <option value="all">All</option>
-
-              <option value="match">MATCH</option>
-
-              <option value="no-match">DO NOT MATCH</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- ===================================================
-             LOADING
-             =================================================== -->
-
-        <div id="history-loading" class="history-message" style="display: none">
-          Loading scan history...
-        </div>
-
-        <!-- ===================================================
-             ERROR
-             =================================================== -->
-
-        <div
-          id="history-error"
-          class="history-message error"
-          style="display: none"
-        ></div>
-
-        <!-- ===================================================
-             TABLE
-             =================================================== -->
-
-        <div class="history-table-container">
-          <table id="history-table">
-            <thead>
-              <tr>
-                <th>Date / Time</th>
-
-                <th>Type</th>
-
-                <th>Staff ID</th>
-
-                <th>Medication / Product Barcode</th>
-
-                <th>Label / Label Barcode</th>
-
-                <th>Result</th>
-
-                <th>Confidence</th>
-
-                <th>Details</th>
-              </tr>
-            </thead>
-
-            <tbody id="history-table-body"></tbody>
-          </table>
-        </div>
-
-        <!-- ===================================================
-             EMPTY STATE
-             =================================================== -->
-
-        <div id="history-empty" class="history-message" style="display: none">
-          No scan records found.
-        </div>
-
-        <!-- ===================================================
-             HISTORY DETAILS
-             =================================================== -->
-
-        <div id="history-detail-box">
-          <h3>Verification Details</h3>
-
-          <div id="history-detail-content"></div>
-
-          <button id="close-detail-btn" class="secondary-btn close-detail-btn">
-            Close Details
-          </button>
-        </div>
-      </div>
-
-      <!-- =====================================================
-           PRIVACY
-           ===================================================== -->
-
-      <div class="privacy-note">
-        Captured images are held temporarily in this webpage while verification
-        is being performed and are sent to the verification service for
-        analysis. This webpage does not save captured images to localStorage,
-        sessionStorage, or downloadable files.
-      </div>
+    <div class="step-title">
+      Staff Identification
     </div>
 
-    <script>
-      /* =====================================================
-         VARIABLES
-         ===================================================== */
+    <div class="step-description">
+      Please enter your Staff ID before starting medication verification.
+    </div>
+
+    <label for="staff-id">
+      Staff ID
+    </label>
+
+    <input
+      type="text"
+      id="staff-id"
+      placeholder="Enter your Staff ID"
+      autocomplete="off"
+      maxlength="30"
+    />
+
+    <button
+      id="start-verification-btn"
+      class="primary-btn"
+    >
+      Start Verification
+    </button>
+
+    <div
+      id="staff-id-error"
+      class="error"
+      style="display: none; margin-top: 10px"
+    >
+      Please enter your Staff ID.
+    </div>
+
+  </div>
+
+
+  <!-- ===================================================
+       STEP 1 — MEDICATION
+       =================================================== -->
+
+  <div id="step-1" class="step">
+
+    <div class="step-title">
+      Step 1: Capture Medication
+    </div>
+
+    <div class="step-description">
+      Position the medication box or bottle clearly inside the camera
+      view.
+    </div>
+
+    <div class="camera-container">
+
+      <video
+        id="webcam"
+        autoplay
+        playsinline
+      ></video>
+
+    </div>
+
+    <div id="camera-status">
+      Camera is off.
+    </div>
+
+    <button
+      id="capture-medication-btn"
+      class="primary-btn"
+      disabled
+    >
+      📷 Capture Medication
+    </button>
+
+    <button
+      id="stop-camera-btn"
+      class="secondary-btn"
+    >
+      📷 Start Camera
+    </button>
+
+  </div>
+
+
+  <!-- ===================================================
+       STEP 2 — LABEL
+       =================================================== -->
+
+  <div id="step-2" class="step">
+
+    <div class="step-title">
+      Step 2: Capture Prescription Label
+    </div>
+
+    <div class="step-description">
+      Position the prescription or cartfill label clearly inside the
+      camera view.
+    </div>
+
+    <div class="camera-container">
+
+      <video
+        id="webcam-step-2"
+        autoplay
+        playsinline
+      ></video>
 
-      const staffIdScreen = document.getElementById("staff-id-screen");
+    </div>
 
-      const staffIdInput = document.getElementById("staff-id");
+    <div id="camera-status-step-2">
+      Camera is off.
+    </div>
 
-      const startVerificationBtn = document.getElementById(
-        "start-verification-btn",
-      );
+    <button
+      id="capture-label-btn"
+      class="primary-btn"
+      disabled
+    >
+      📷 Capture Prescription Label
+    </button>
 
-      const staffIdError = document.getElementById("staff-id-error");
+    <button
+      id="stop-camera-btn-step-2"
+      class="secondary-btn"
+    >
+      📷 Start Camera
+    </button>
 
-      const verificationInterface = document.getElementById(
-        "verification-interface",
-      );
+  </div>
 
-      const showHistoryBtn = document.getElementById("show-history-btn");
 
-      const scanHistoryScreen = document.getElementById("scan-history-screen");
+  <!-- ===================================================
+       PREVIEWS
+       =================================================== -->
 
-      const backToVerificationBtn = document.getElementById(
-        "back-to-verification-btn",
-      );
+  <div
+    id="medication-preview-container"
+    class="preview-container"
+    style="display: none"
+  >
 
-      let staffId = null;
+    <h3>
+      Medication Image
+    </h3>
 
-      /* =====================================================
-         STAFF ID EVENT LISTENER
-         ===================================================== */
+    <img
+      id="medication-preview"
+      class="preview"
+      alt="Captured medication"
+    />
 
-      startVerificationBtn.addEventListener("click", () => {
-        const enteredStaffId = staffIdInput.value.trim();
+  </div>
 
-        if (!enteredStaffId) {
-          staffIdError.style.display = "block";
 
-          return;
-        }
+  <div
+    id="label-preview-container"
+    class="preview-container"
+    style="display: none"
+  >
 
-        staffId = enteredStaffId;
+    <h3>
+      Prescription Label Image
+    </h3>
 
-        staffIdError.style.display = "none";
+    <img
+      id="label-preview"
+      class="preview"
+      alt="Captured prescription label"
+    />
 
-        /*
-         * Hide Staff ID screen.
-         */
+  </div>
 
-        staffIdScreen.classList.remove("active");
 
-        /*
-         * Show Step 1.
-         */
+  <!-- ===================================================
+       VERIFY
+       =================================================== -->
 
-        document.getElementById("step-1").classList.add("active");
+  <button
+    id="verify-btn"
+    class="verify-btn"
+    style="display: none"
+  >
+    🔍 Scan & Verify Match
+  </button>
 
-        /*
-         * Camera stays OFF.
-         */
 
-        stopCamera();
-      });
+  <!-- ===================================================
+       RESET
+       =================================================== -->
 
-      /* =====================================================
-         ENTER KEY SUPPORT
-         ===================================================== */
+  <button
+    id="reset-btn"
+    class="reset-btn"
+  >
+    ↻ Start New Verification
+  </button>
 
-      staffIdInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          startVerificationBtn.click();
-        }
-      });
 
-      /* =====================================================
-         CAMERA VARIABLES
-         ===================================================== */
+  <!-- ===================================================
+       RESULT
+       =================================================== -->
 
-      const video = document.getElementById("webcam");
+  <div id="result-box">
 
-      const videoStep2 = document.getElementById("webcam-step-2");
+    <h3>
+      Verification Result
+    </h3>
 
-      const captureMedicationBtn = document.getElementById(
-        "capture-medication-btn",
-      );
+    <p id="output-text"></p>
 
-      const captureLabelBtn = document.getElementById("capture-label-btn");
+  </div>
 
-      const stopCameraBtn = document.getElementById("stop-camera-btn");
+</div>
 
-      const stopCameraBtnStep2 = document.getElementById(
-        "stop-camera-btn-step-2",
-      );
 
-      const cameraStatusStep2 = document.getElementById("camera-status-step-2");
+<!-- =====================================================
+     SCAN HISTORY
+     ===================================================== -->
 
-      const verifyBtn = document.getElementById("verify-btn");
+<div id="scan-history-screen">
 
-      const resetBtn = document.getElementById("reset-btn");
+  <div class="history-header">
 
-      const resultBox = document.getElementById("result-box");
+    <div>
 
-      const outputText = document.getElementById("output-text");
+      <h2>
+        Scan History
+      </h2>
 
-      const cameraStatus = document.getElementById("camera-status");
+      <p class="history-description">
+        View previous medication verification records.
+      </p>
 
-      const medicationPreview = document.getElementById("medication-preview");
+    </div>
 
-      const labelPreview = document.getElementById("label-preview");
+    <button
+      id="back-to-verification-btn"
+      class="secondary-btn history-back-btn"
+    >
+      ← New Verification
+    </button>
 
-      const medicationPreviewContainer = document.getElementById(
-        "medication-preview-container",
-      );
+  </div>
 
-      const labelPreviewContainer = document.getElementById(
-        "label-preview-container",
-      );
 
-      /* =====================================================
-         APP STATE
-         ===================================================== */
+  <!-- ===================================================
+       FILTERS
+       =================================================== -->
 
-      let medicationImage = null;
+  <div class="history-filters">
 
-      let labelImage = null;
+    <div class="history-search">
 
-      let cameraStream = null;
+      <label for="history-search">
+        Search
+      </label>
 
-      let cameraIsOn = false;
+      <input
+        type="text"
+        id="history-search"
+        placeholder="Search Staff ID or medication"
+        autocomplete="off"
+      />
 
-      /* =====================================================
-         START CAMERA
-         ===================================================== */
+    </div>
 
-      async function startCamera() {
-        /*
-         * If a camera is already running,
-         * stop it before starting a new one.
-         */
 
-        if (cameraStream) {
-          stopCamera();
-        }
+    <div class="history-result-filter">
 
-        cameraStatus.innerText = "Starting camera...";
+      <div class="history-type-filter">
 
-        cameraStatus.className = "";
+        <label for="history-type-filter">
+          Verification Type
+        </label>
 
-        try {
-          /*
-           * Prefer the rear camera.
-           */
+        <select id="history-type-filter">
 
-          const constraints = {
-            video: {
-              facingMode: {
-                ideal: "environment",
-              },
+          <option value="all">
+            All
+          </option>
 
-              width: {
-                ideal: 1280,
-              },
+          <option value="AI">
+            🤖 AI
+          </option>
 
-              height: {
-                ideal: 720,
-              },
-            },
+          <option value="QR">
+            📱 QR
+          </option>
 
-            audio: false,
-          };
+        </select>
 
-          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+      </div>
 
-          /*
-           * Use the same camera stream
-           * for both steps.
-           */
 
-          video.srcObject = cameraStream;
+      <label for="history-result-filter">
+        Result
+      </label>
 
-          videoStep2.srcObject = cameraStream;
+      <select id="history-result-filter">
 
-          cameraIsOn = true;
+        <option value="all">
+          All
+        </option>
 
-          /*
-           * Update buttons.
-           */
+        <option value="match">
+          MATCH
+        </option>
 
-          stopCameraBtn.innerText = "⏹️ Stop Camera";
+        <option value="no-match">
+          DO NOT MATCH
+        </option>
 
-          stopCameraBtnStep2.innerText = "⏹️ Stop Camera";
+      </select>
 
-          captureMedicationBtn.disabled = false;
+    </div>
 
-          captureLabelBtn.disabled = false;
+  </div>
 
-          cameraStatus.innerText = "Rear camera active";
 
-          cameraStatusStep2.innerText = "Rear camera active";
-        } catch (error) {
-          console.error("Camera error:", error);
+  <!-- ===================================================
+       LOADING
+       =================================================== -->
 
-          cameraIsOn = false;
+  <div
+    id="history-loading"
+    class="history-message"
+    style="display: none"
+  >
+    Loading scan history...
+  </div>
 
-          cameraStatus.innerText = "Unable to access the camera.";
 
-          cameraStatus.className = "error";
-        }
+  <!-- ===================================================
+       ERROR
+       =================================================== -->
+
+  <div
+    id="history-error"
+    class="history-message error"
+    style="display: none"
+  ></div>
+
+
+  <!-- ===================================================
+       TABLE
+       =================================================== -->
+
+  <div class="history-table-container">
+
+    <table id="history-table">
+
+      <thead>
+
+        <tr>
+
+          <th>Date / Time</th>
+          <th>Type</th>
+          <th>Staff ID</th>
+          <th>Medication / Product Barcode</th>
+          <th>Label / Label Barcode</th>
+          <th>Result</th>
+          <th>Confidence</th>
+          <th>Details</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody id="history-table-body"></tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- ===================================================
+       EMPTY STATE
+       =================================================== -->
+
+  <div
+    id="history-empty"
+    class="history-message"
+    style="display: none"
+  >
+    No scan records found.
+  </div>
+
+
+  <!-- ===================================================
+       HISTORY DETAILS
+       =================================================== -->
+
+  <div id="history-detail-box">
+
+    <h3>
+      Verification Details
+    </h3>
+
+    <div id="history-detail-content"></div>
+
+    <button
+      id="close-detail-btn"
+      class="secondary-btn close-detail-btn"
+    >
+      Close Details
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     PRIVACY
+     ===================================================== -->
+
+<div class="privacy-note">
+
+  Captured images are held temporarily in this webpage while verification
+  is being performed and are sent to the verification service for
+  analysis. This webpage does not save captured images to localStorage,
+  sessionStorage, or downloadable files.
+
+</div>
+```
+
+  </div>
+
+  <script>
+
+    /* =====================================================
+       VARIABLES
+       ===================================================== */
+
+    const staffIdScreen =
+      document.getElementById("staff-id-screen");
+
+    const staffIdInput =
+      document.getElementById("staff-id");
+
+    const startVerificationBtn =
+      document.getElementById("start-verification-btn");
+
+    const staffIdError =
+      document.getElementById("staff-id-error");
+
+    const verificationInterface =
+      document.getElementById("verification-interface");
+
+    const showHistoryBtn =
+      document.getElementById("show-history-btn");
+
+    const scanHistoryScreen =
+      document.getElementById("scan-history-screen");
+
+    const backToVerificationBtn =
+      document.getElementById("back-to-verification-btn");
+
+    const aiNavBtn =
+      document.getElementById("ai-nav-btn");
+
+    const qrNavBtn =
+      document.getElementById("qr-nav-btn");
+
+    let staffId = null;
+
+
+    /* =====================================================
+       NAVIGATION STATE
+       ===================================================== */
+
+    function setActiveNavigation(activePage) {
+
+      aiNavBtn.classList.remove("active");
+      qrNavBtn.classList.remove("active");
+      showHistoryBtn.classList.remove("active");
+
+      if (activePage === "ai") {
+        aiNavBtn.classList.add("active");
       }
 
-      /* =====================================================
-         STOP CAMERA
-         ===================================================== */
+      if (activePage === "history") {
+        showHistoryBtn.classList.add("active");
+      }
 
-      function stopCamera() {
-        if (cameraStream) {
-          cameraStream.getTracks().forEach((track) => {
-            track.stop();
-          });
+    }
 
-          cameraStream = null;
-        }
+
+    /* =====================================================
+       STAFF ID EVENT LISTENER
+       ===================================================== */
+
+    startVerificationBtn.addEventListener("click", () => {
+
+      const enteredStaffId =
+        staffIdInput.value.trim();
+
+      if (!enteredStaffId) {
+
+        staffIdError.style.display = "block";
+
+        return;
+      }
+
+      staffId = enteredStaffId;
+
+      staffIdError.style.display = "none";
+
+      /*
+       * Hide Staff ID screen.
+       */
+
+      staffIdScreen.classList.remove("active");
+
+      /*
+       * Show Step 1.
+       */
+
+      document
+        .getElementById("step-1")
+        .classList.add("active");
+
+      /*
+       * Camera stays OFF.
+       */
+
+      stopCamera();
+
+    });
+
+
+    /* =====================================================
+       ENTER KEY SUPPORT
+       ===================================================== */
+
+    staffIdInput.addEventListener("keydown", (event) => {
+
+      if (event.key === "Enter") {
+
+        startVerificationBtn.click();
+
+      }
+
+    });
+
+
+    /* =====================================================
+       CAMERA VARIABLES
+       ===================================================== */
+
+    const video =
+      document.getElementById("webcam");
+
+    const videoStep2 =
+      document.getElementById("webcam-step-2");
+
+    const captureMedicationBtn =
+      document.getElementById("capture-medication-btn");
+
+    const captureLabelBtn =
+      document.getElementById("capture-label-btn");
+
+    const stopCameraBtn =
+      document.getElementById("stop-camera-btn");
+
+    const stopCameraBtnStep2 =
+      document.getElementById("stop-camera-btn-step-2");
+
+    const cameraStatusStep2 =
+      document.getElementById("camera-status-step-2");
+
+    const verifyBtn =
+      document.getElementById("verify-btn");
+
+    const resetBtn =
+      document.getElementById("reset-btn");
+
+    const resultBox =
+      document.getElementById("result-box");
+
+    const outputText =
+      document.getElementById("output-text");
+
+    const cameraStatus =
+      document.getElementById("camera-status");
+
+    const medicationPreview =
+      document.getElementById("medication-preview");
+
+    const labelPreview =
+      document.getElementById("label-preview");
+
+    const medicationPreviewContainer =
+      document.getElementById(
+        "medication-preview-container"
+      );
+
+    const labelPreviewContainer =
+      document.getElementById(
+        "label-preview-container"
+      );
+
+
+    /* =====================================================
+       APP STATE
+       ===================================================== */
+
+    let medicationImage = null;
+    let labelImage = null;
+    let cameraStream = null;
+    let cameraIsOn = false;
+
+
+    /* =====================================================
+       START CAMERA
+       ===================================================== */
+
+    async function startCamera() {
+
+      /*
+       * If a camera is already running,
+       * stop it before starting a new one.
+       */
+
+      if (cameraStream) {
+        stopCamera();
+      }
+
+      cameraStatus.innerText =
+        "Starting camera...";
+
+      cameraStatus.className = "";
+
+      try {
 
         /*
-         * Disconnect the stream.
+         * Prefer the rear camera.
          */
 
-        video.srcObject = null;
+        const constraints = {
 
-        videoStep2.srcObject = null;
+          video: {
 
-        cameraIsOn = false;
+            facingMode: {
+              ideal: "environment",
+            },
+
+            width: {
+              ideal: 1280,
+            },
+
+            height: {
+              ideal: 720,
+            },
+
+          },
+
+          audio: false,
+
+        };
+
+        cameraStream =
+          await navigator.mediaDevices
+            .getUserMedia(constraints);
+
+        /*
+         * Use the same camera stream
+         * for both steps.
+         */
+
+        video.srcObject =
+          cameraStream;
+
+        videoStep2.srcObject =
+          cameraStream;
+
+        cameraIsOn = true;
 
         /*
          * Update buttons.
          */
 
-        stopCameraBtn.innerText = "📷 Start Camera";
+        stopCameraBtn.innerText =
+          "⏹️ Stop Camera";
 
-        stopCameraBtnStep2.innerText = "📷 Start Camera";
+        stopCameraBtnStep2.innerText =
+          "⏹️ Stop Camera";
 
-        /*
-         * Prevent capturing.
-         */
+        captureMedicationBtn.disabled =
+          false;
 
-        captureMedicationBtn.disabled = true;
+        captureLabelBtn.disabled =
+          false;
 
-        captureLabelBtn.disabled = true;
+        cameraStatus.innerText =
+          "Rear camera active";
 
-        cameraStatus.innerText = "Camera is off.";
+        cameraStatusStep2.innerText =
+          "Rear camera active";
 
-        cameraStatusStep2.innerText = "Camera is off.";
+      } catch (error) {
 
-        cameraStatus.className = "";
+        console.error(
+          "Camera error:",
+          error
+        );
+
+        cameraIsOn = false;
+
+        cameraStatus.innerText =
+          "Unable to access the camera.";
+
+        cameraStatus.className =
+          "error";
+
       }
 
-      /* =====================================================
-         START / STOP CAMERA BUTTON
-         ===================================================== */
+    }
 
-      stopCameraBtn.addEventListener("click", async () => {
-        if (cameraIsOn) {
-          stopCamera();
-        } else {
-          await startCamera();
-        }
-      });
 
-      stopCameraBtnStep2.addEventListener("click", async () => {
-        if (cameraIsOn) {
-          stopCamera();
-        } else {
-          await startCamera();
-        }
-      });
+    /* =====================================================
+       STOP CAMERA
+       ===================================================== */
 
-      /* =====================================================
-         CAPTURE IMAGE
-         ===================================================== */
+    function stopCamera() {
 
-      function captureImage(videoElement) {
-        if (!videoElement.videoWidth || !videoElement.videoHeight) {
-          alert("Camera is not ready yet. Please wait a moment and try again.");
+      if (cameraStream) {
 
-          return null;
-        }
+        cameraStream
+          .getTracks()
+          .forEach((track) => {
+            track.stop();
+          });
 
-        const canvas = document.createElement("canvas");
+        cameraStream = null;
 
-        canvas.width = videoElement.videoWidth;
-
-        canvas.height = videoElement.videoHeight;
-
-        const context = canvas.getContext("2d");
-
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-        /*
-         * Convert the captured frame
-         * into a JPEG held temporarily
-         * in memory.
-         */
-
-        return canvas.toDataURL("image/jpeg", 0.85);
       }
 
-      /* =====================================================
-         CAPTURE MEDICATION
-         ===================================================== */
+      /*
+       * Disconnect the stream.
+       */
 
-      captureMedicationBtn.addEventListener("click", () => {
-        const image = captureImage(video);
+      video.srcObject = null;
+      videoStep2.srcObject = null;
+
+      cameraIsOn = false;
+
+      /*
+       * Update buttons.
+       */
+
+      stopCameraBtn.innerText =
+        "📷 Start Camera";
+
+      stopCameraBtnStep2.innerText =
+        "📷 Start Camera";
+
+      /*
+       * Prevent capturing.
+       */
+
+      captureMedicationBtn.disabled =
+        true;
+
+      captureLabelBtn.disabled =
+        true;
+
+      cameraStatus.innerText =
+        "Camera is off.";
+
+      cameraStatusStep2.innerText =
+        "Camera is off.";
+
+      cameraStatus.className = "";
+
+    }
+
+
+    /* =====================================================
+       START / STOP CAMERA BUTTON
+       ===================================================== */
+
+    stopCameraBtn.addEventListener(
+      "click",
+      async () => {
+
+        if (cameraIsOn) {
+
+          stopCamera();
+
+        } else {
+
+          await startCamera();
+
+        }
+
+      }
+    );
+
+
+    stopCameraBtnStep2.addEventListener(
+      "click",
+      async () => {
+
+        if (cameraIsOn) {
+
+          stopCamera();
+
+        } else {
+
+          await startCamera();
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       CAPTURE IMAGE
+       ===================================================== */
+
+    function captureImage(videoElement) {
+
+      if (
+        !videoElement.videoWidth ||
+        !videoElement.videoHeight
+      ) {
+
+        alert(
+          "Camera is not ready yet. Please wait a moment and try again."
+        );
+
+        return null;
+
+      }
+
+      const canvas =
+        document.createElement("canvas");
+
+      canvas.width =
+        videoElement.videoWidth;
+
+      canvas.height =
+        videoElement.videoHeight;
+
+      const context =
+        canvas.getContext("2d");
+
+      context.drawImage(
+        videoElement,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      /*
+       * Convert the captured frame
+       * into a JPEG held temporarily
+       * in memory.
+       */
+
+      return canvas.toDataURL(
+        "image/jpeg",
+        0.85
+      );
+
+    }
+
+
+    /* =====================================================
+       CAPTURE MEDICATION
+       ===================================================== */
+
+    captureMedicationBtn.addEventListener(
+      "click",
+      () => {
+
+        const image =
+          captureImage(video);
 
         if (!image) {
           return;
@@ -1364,29 +1547,46 @@
          * Display temporary preview.
          */
 
-        medicationPreview.src = medicationImage;
+        medicationPreview.src =
+          medicationImage;
 
-        medicationPreviewContainer.style.display = "block";
+        medicationPreviewContainer.style.display =
+          "block";
 
         /*
          * Move to Step 2.
          */
 
-        document.getElementById("step-1").classList.remove("active");
+        document
+          .getElementById("step-1")
+          .classList.remove("active");
 
-        document.getElementById("step-2").classList.add("active");
+        document
+          .getElementById("step-2")
+          .classList.add("active");
 
-        document.getElementById("indicator-1").classList.add("active");
+        document
+          .getElementById("indicator-1")
+          .classList.add("active");
 
-        document.getElementById("indicator-2").classList.add("active");
-      });
+        document
+          .getElementById("indicator-2")
+          .classList.add("active");
 
-      /* =====================================================
-         CAPTURE LABEL
-         ===================================================== */
+      }
+    );
 
-      captureLabelBtn.addEventListener("click", () => {
-        const image = captureImage(videoStep2);
+
+    /* =====================================================
+       CAPTURE LABEL
+       ===================================================== */
+
+    captureLabelBtn.addEventListener(
+      "click",
+      () => {
+
+        const image =
+          captureImage(videoStep2);
 
         if (!image) {
           return;
@@ -1398,9 +1598,11 @@
          * Display temporary preview.
          */
 
-        labelPreview.src = labelImage;
+        labelPreview.src =
+          labelImage;
 
-        labelPreviewContainer.style.display = "block";
+        labelPreviewContainer.style.display =
+          "block";
 
         /*
          * Both images captured.
@@ -1413,32 +1615,49 @@
          * Hide Step 2.
          */
 
-        document.getElementById("step-2").classList.remove("active");
+        document
+          .getElementById("step-2")
+          .classList.remove("active");
 
         /*
          * Show verification button.
          */
 
-        verifyBtn.style.display = "block";
-      });
+        verifyBtn.style.display =
+          "block";
 
-      /* =====================================================
-         VERIFY
-         ===================================================== */
+      }
+    );
 
-      verifyBtn.addEventListener("click", async () => {
-        if (!medicationImage || !labelImage) {
+
+    /* =====================================================
+       VERIFY
+       ===================================================== */
+
+    verifyBtn.addEventListener(
+      "click",
+      async () => {
+
+        if (
+          !medicationImage ||
+          !labelImage
+        ) {
+
           outputText.innerText =
             "Both images are required before verification.";
 
-          resultBox.style.display = "block";
+          resultBox.style.display =
+            "block";
 
           return;
+
         }
 
-        resultBox.style.display = "block";
+        resultBox.style.display =
+          "block";
 
-        outputText.className = "loading";
+        outputText.className =
+          "loading";
 
         outputText.innerText =
           "AI is analyzing the medication and prescription label...";
@@ -1446,30 +1665,45 @@
         verifyBtn.disabled = true;
 
         try {
-          const response = await fetch("/verify", {
-            method: "POST",
 
-            headers: {
-              "Content-Type": "application/json",
-            },
+          const response =
+            await fetch("/verify", {
 
-            body: JSON.stringify({
-              staffId: staffId,
+              method: "POST",
 
-              medImage: medicationImage,
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-              labelImage: labelImage,
-            }),
-          });
+              body: JSON.stringify({
 
-          const data = await response.json();
+                staffId: staffId,
+
+                medImage:
+                  medicationImage,
+
+                labelImage:
+                  labelImage,
+
+              }),
+
+            });
+
+          const data =
+            await response.json();
 
           outputText.className = "";
 
           if (data.result) {
-            const result = data.result;
 
-            const matchText = result.match ? "MATCH" : "DO NOT MATCH";
+            const result =
+              data.result;
+
+            const matchText =
+              result.match
+                ? "MATCH"
+                : "DO NOT MATCH";
 
             outputText.innerText =
               `Verification Result: ${matchText}\n\n` +
@@ -1479,574 +1713,1027 @@
               `Strength: ${result.label_strength}\n\n` +
               `Confidence: ${result.confidence}\n\n` +
               `Reason: ${result.reason}`;
+
           } else if (data.error) {
-            outputText.className = "error";
 
-            outputText.innerText = "Error: " + data.error;
+            outputText.className =
+              "error";
+
+            outputText.innerText =
+              "Error: " + data.error;
+
           } else {
-            outputText.innerText = "No verification result was returned.";
-          }
-        } catch (error) {
-          console.error("Verification error:", error);
 
-          outputText.className = "error";
+            outputText.innerText =
+              "No verification result was returned.";
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "Verification error:",
+            error
+          );
+
+          outputText.className =
+            "error";
 
           outputText.innerText =
             "Network error connecting to the verification service.";
+
         }
 
         verifyBtn.disabled = false;
-      });
 
-      /* =====================================================
-         RESET / START NEW VERIFICATION
-         ===================================================== */
-
-      resetBtn.addEventListener("click", () => {
-        resetApp();
-      });
-
-      function resetApp() {
-        /*
-         * Stop camera.
-         */
-
-        stopCamera();
-
-        /*
-         * Clear captured images
-         * from memory.
-         */
-
-        medicationImage = null;
-
-        labelImage = null;
-
-        /*
-         * Clear previews.
-         */
-
-        medicationPreview.src = "";
-
-        labelPreview.src = "";
-
-        medicationPreviewContainer.style.display = "none";
-
-        labelPreviewContainer.style.display = "none";
-
-        /*
-         * Clear result.
-         */
-
-        outputText.innerText = "";
-
-        outputText.className = "";
-
-        resultBox.style.display = "none";
-
-        /*
-         * Hide verification button.
-         */
-
-        verifyBtn.style.display = "none";
-
-        verifyBtn.disabled = false;
-
-        /*
-         * Clear Staff ID.
-         */
-
-        staffId = null;
-
-        staffIdInput.value = "";
-
-        staffIdError.style.display = "none";
-
-        /*
-         * Hide Step 1 and Step 2.
-         */
-
-        document.getElementById("step-1").classList.remove("active");
-
-        document.getElementById("step-2").classList.remove("active");
-
-        /*
-         * Show Staff ID screen.
-         */
-
-        staffIdScreen.classList.add("active");
-
-        /*
-         * Reset progress indicator.
-         */
-
-        document.getElementById("indicator-1").classList.add("active");
-
-        document.getElementById("indicator-2").classList.remove("active");
       }
+    );
 
-      /* =====================================================
-         SCAN HISTORY
-         ===================================================== */
 
-      const historyTableBody = document.getElementById("history-table-body");
+    /* =====================================================
+       RESET / START NEW VERIFICATION
+       ===================================================== */
 
-      const historyLoading = document.getElementById("history-loading");
+    resetBtn.addEventListener(
+      "click",
+      () => {
+        resetApp();
+      }
+    );
 
-      const historyError = document.getElementById("history-error");
 
-      const historyEmpty = document.getElementById("history-empty");
+    function resetApp() {
 
-      const historySearch = document.getElementById("history-search");
+      /*
+       * Stop camera.
+       */
 
-      const historyResultFilter = document.getElementById(
-        "history-result-filter",
+      stopCamera();
+
+      /*
+       * Clear captured images
+       * from memory.
+       */
+
+      medicationImage = null;
+      labelImage = null;
+
+      /*
+       * Clear previews.
+       */
+
+      medicationPreview.src = "";
+      labelPreview.src = "";
+
+      medicationPreviewContainer.style.display =
+        "none";
+
+      labelPreviewContainer.style.display =
+        "none";
+
+      /*
+       * Clear result.
+       */
+
+      outputText.innerText = "";
+      outputText.className = "";
+
+      resultBox.style.display =
+        "none";
+
+      /*
+       * Hide verification button.
+       */
+
+      verifyBtn.style.display =
+        "none";
+
+      verifyBtn.disabled =
+        false;
+
+      /*
+       * Clear Staff ID.
+       */
+
+      staffId = null;
+
+      staffIdInput.value = "";
+
+      staffIdError.style.display =
+        "none";
+
+      /*
+       * Hide Step 1 and Step 2.
+       */
+
+      document
+        .getElementById("step-1")
+        .classList.remove("active");
+
+      document
+        .getElementById("step-2")
+        .classList.remove("active");
+
+      /*
+       * Show Staff ID screen.
+       */
+
+      staffIdScreen.classList.add(
+        "active"
       );
 
-      const historyTypeFilter = document.getElementById("history-type-filter");
+      /*
+       * Reset progress indicator.
+       */
 
-      const historyDetailBox = document.getElementById("history-detail-box");
+      document
+        .getElementById("indicator-1")
+        .classList.add("active");
 
-      const historyDetailContent = document.getElementById(
-        "history-detail-content",
+      document
+        .getElementById("indicator-2")
+        .classList.remove("active");
+
+    }
+
+
+    /* =====================================================
+       SCAN HISTORY VARIABLES
+       ===================================================== */
+
+    const historyTableBody =
+      document.getElementById(
+        "history-table-body"
       );
 
-      const closeDetailBtn = document.getElementById("close-detail-btn");
+    const historyLoading =
+      document.getElementById(
+        "history-loading"
+      );
 
-      let scanHistoryRecords = [];
+    const historyError =
+      document.getElementById(
+        "history-error"
+      );
 
-      /* =====================================================
-         SHOW HISTORY
-         ===================================================== */
+    const historyEmpty =
+      document.getElementById(
+        "history-empty"
+      );
 
-      showHistoryBtn.addEventListener("click", () => {
-        /*
-         * Stop camera if somehow active.
-         */
+    const historySearch =
+      document.getElementById(
+        "history-search"
+      );
 
-        stopCamera();
+    const historyResultFilter =
+      document.getElementById(
+        "history-result-filter"
+      );
 
-        /*
-         * Hide verification interface.
-         */
+    const historyTypeFilter =
+      document.getElementById(
+        "history-type-filter"
+      );
 
-        verificationInterface.style.display = "none";
+    const historyDetailBox =
+      document.getElementById(
+        "history-detail-box"
+      );
 
-        /*
-         * Show history.
-         */
+    const historyDetailContent =
+      document.getElementById(
+        "history-detail-content"
+      );
 
-        scanHistoryScreen.classList.add("active");
+    const closeDetailBtn =
+      document.getElementById(
+        "close-detail-btn"
+      );
 
-        /*
-         * Hide detail view.
-         */
+    let scanHistoryRecords = [];
 
-        historyDetailBox.style.display = "none";
 
-        loadScanHistory();
-      });
+    /* =====================================================
+       OPEN HISTORY
+       ===================================================== */
 
-      /* =====================================================
-         RETURN TO VERIFICATION
-         ===================================================== */
+    function openHistory() {
 
-      backToVerificationBtn.addEventListener("click", () => {
-        scanHistoryScreen.classList.remove("active");
+      /*
+       * Stop camera if somehow active.
+       */
 
-        verificationInterface.style.display = "block";
+      stopCamera();
+
+      /*
+       * Hide verification interface.
+       */
+
+      verificationInterface.style.display =
+        "none";
+
+      /*
+       * Show history.
+       */
+
+      scanHistoryScreen.classList.add(
+        "active"
+      );
+
+      /*
+       * Update navigation highlight.
+       */
+
+      setActiveNavigation(
+        "history"
+      );
+
+      /*
+       * Hide detail view.
+       */
+
+      historyDetailBox.style.display =
+        "none";
+
+      /*
+       * Load records.
+       */
+
+      loadScanHistory();
+
+    }
+
+
+    /* =====================================================
+       SHOW HISTORY BUTTON
+       ===================================================== */
+
+    showHistoryBtn.addEventListener(
+      "click",
+      () => {
+
+        openHistory();
+
+      }
+    );
+
+
+    /* =====================================================
+       RETURN TO VERIFICATION
+       ===================================================== */
+
+    backToVerificationBtn.addEventListener(
+      "click",
+      () => {
+
+        scanHistoryScreen.classList.remove(
+          "active"
+        );
+
+        verificationInterface.style.display =
+          "block";
+
+        setActiveNavigation(
+          "ai"
+        );
 
         /*
          * Start a fresh verification.
          */
 
         resetApp();
-      });
 
-      /* =====================================================
-         LOAD HISTORY
-         ===================================================== */
+      }
+    );
 
-      async function loadScanHistory() {
-        historyLoading.style.display = "block";
 
-        historyError.style.display = "none";
+    /* =====================================================
+       LOAD HISTORY
+       ===================================================== */
 
-        historyEmpty.style.display = "none";
+    async function loadScanHistory() {
 
-        historyTableBody.innerHTML = "";
+      historyLoading.style.display =
+        "block";
 
-        try {
-          const response = await fetch("/history");
+      historyError.style.display =
+        "none";
 
-          const data = await response.json();
+      historyEmpty.style.display =
+        "none";
 
-          if (!response.ok) {
-            throw new Error(data.error || "Unable to load scan history.");
-          }
+      historyTableBody.innerHTML =
+        "";
 
-          scanHistoryRecords = data.records || [];
+      try {
 
-          renderScanHistory();
-        } catch (error) {
-          console.error("Scan history error:", error);
+        const response =
+          await fetch("/history");
 
-          historyError.innerText = "Unable to load scan history.";
+        const data =
+          await response.json();
 
-          historyError.style.display = "block";
-        } finally {
-          historyLoading.style.display = "none";
+        if (!response.ok) {
+
+          throw new Error(
+            data.error ||
+            "Unable to load scan history."
+          );
+
         }
+
+        scanHistoryRecords =
+          data.records || [];
+
+        renderScanHistory();
+
+      } catch (error) {
+
+        console.error(
+          "Scan history error:",
+          error
+        );
+
+        historyError.innerText =
+          "Unable to load scan history.";
+
+        historyError.style.display =
+          "block";
+
+      } finally {
+
+        historyLoading.style.display =
+          "none";
+
       }
 
-      /* =====================================================
-         RENDER HISTORY
-         ===================================================== */
+    }
 
-      function renderScanHistory() {
-        const searchTerm = historySearch.value.trim().toLowerCase();
 
-        const resultFilter = historyResultFilter.value;
+    /* =====================================================
+       RENDER HISTORY
+       ===================================================== */
 
-        const typeFilter = historyTypeFilter.value;
+    function renderScanHistory() {
 
-        const filteredRecords = scanHistoryRecords.filter((record) => {
-          /*
-           * Search Staff ID or medication.
-           */
+      const searchTerm =
+        historySearch.value
+          .trim()
+          .toLowerCase();
 
-          const matchesSearch =
-            !searchTerm ||
-            String(record.staff_id || "")
-              .toLowerCase()
-              .includes(searchTerm) ||
-            String(record.medication_name || "")
-              .toLowerCase()
-              .includes(searchTerm) ||
-            String(record.label_name || "")
-              .toLowerCase()
-              .includes(searchTerm) ||
-            String(record.medication_product_id || "")
-              .toLowerCase()
-              .includes(searchTerm) ||
-            String(record.label_product_id || "")
-              .toLowerCase()
-              .includes(searchTerm);
+      const resultFilter =
+        historyResultFilter.value;
 
-          /*
-           * Result filter.
-           */
+      const typeFilter =
+        historyTypeFilter.value;
 
-          let matchesResult = true;
+      const filteredRecords =
+        scanHistoryRecords.filter(
+          (record) => {
 
-          if (resultFilter === "match") {
-            matchesResult = record.match === true;
-          } else if (resultFilter === "no-match") {
-            matchesResult = record.match === false;
+            /*
+             * Search Staff ID or medication.
+             */
+
+            const matchesSearch =
+              !searchTerm ||
+
+              String(
+                record.staff_id || ""
+              )
+                .toLowerCase()
+                .includes(searchTerm) ||
+
+              String(
+                record.medication_name || ""
+              )
+                .toLowerCase()
+                .includes(searchTerm) ||
+
+              String(
+                record.label_name || ""
+              )
+                .toLowerCase()
+                .includes(searchTerm) ||
+
+              String(
+                record.medication_product_id ||
+                ""
+              )
+                .toLowerCase()
+                .includes(searchTerm) ||
+
+              String(
+                record.label_product_id ||
+                ""
+              )
+                .toLowerCase()
+                .includes(searchTerm);
+
+
+            /*
+             * Result filter.
+             */
+
+            let matchesResult = true;
+
+            if (
+              resultFilter === "match"
+            ) {
+
+              matchesResult =
+                record.match === true;
+
+            } else if (
+              resultFilter === "no-match"
+            ) {
+
+              matchesResult =
+                record.match === false;
+
+            }
+
+
+            /*
+             * Verification type filter.
+             */
+
+            let matchesType = true;
+
+            if (
+              typeFilter !== "all"
+            ) {
+
+              matchesType =
+                record.type ===
+                typeFilter;
+
+            }
+
+
+            return (
+              matchesSearch &&
+              matchesResult &&
+              matchesType
+            );
+
           }
+        );
 
-          let matchesType = true;
 
-          if (typeFilter !== "all") {
-            matchesType = record.type === typeFilter;
-          }
+      historyTableBody.innerHTML =
+        "";
 
-          return matchesSearch && matchesResult && matchesType;
-        });
 
-        historyTableBody.innerHTML = "";
+      /*
+       * No records.
+       */
 
-        /*
-         * No records.
-         */
+      if (
+        filteredRecords.length === 0
+      ) {
 
-        if (filteredRecords.length === 0) {
-          historyEmpty.style.display = "block";
+        historyEmpty.style.display =
+          "block";
 
-          return;
-        }
+        return;
 
-        historyEmpty.style.display = "none";
+      }
 
-        /*
-         * Create rows.
-         */
 
-        filteredRecords.forEach((record) => {
-          const row = document.createElement("tr");
+      historyEmpty.style.display =
+        "none";
+
+
+      /*
+       * Create rows.
+       */
+
+      filteredRecords.forEach(
+        (record) => {
+
+          const row =
+            document.createElement("tr");
+
 
           /*
            * Date / Time
            */
 
-          const dateCell = document.createElement("td");
+          const dateCell =
+            document.createElement("td");
 
-          dateCell.innerText = formatDateTime(record.created_at);
+          dateCell.innerText =
+            formatDateTime(
+              record.created_at
+            );
+
 
           /*
            * Type
            */
 
-          const typeCell = document.createElement("td");
+          const typeCell =
+            document.createElement("td");
 
-          const typeBadge = document.createElement("span");
+          const typeBadge =
+            document.createElement(
+              "span"
+            );
 
-          typeBadge.className = "result-badge";
+          typeBadge.className =
+            "result-badge";
 
-          if (record.type === "QR") {
-            typeBadge.innerText = "📱 QR";
+          if (
+            record.type === "QR"
+          ) {
+
+            typeBadge.innerText =
+              "📱 QR";
+
           } else {
-            typeBadge.innerText = "🤖 AI";
+
+            typeBadge.innerText =
+              "🤖 AI";
+
           }
 
-          typeCell.appendChild(typeBadge);
+          typeCell.appendChild(
+            typeBadge
+          );
+
 
           /*
            * Staff ID
            */
 
-          const staffCell = document.createElement("td");
+          const staffCell =
+            document.createElement("td");
 
-          staffCell.innerText = record.staff_id || "-";
+          staffCell.innerText =
+            record.staff_id || "-";
+
 
           /*
            * Medication
            */
 
-          const medicationCell = document.createElement("td");
+          const medicationCell =
+            document.createElement("td");
 
-          if (record.type === "QR") {
-            medicationCell.innerText = record.medication_product_id || "-";
+          if (
+            record.type === "QR"
+          ) {
+
+            medicationCell.innerText =
+              record.medication_product_id ||
+              "-";
+
           } else {
-            medicationCell.innerText = formatMedication(
-              record.medication_name,
-              record.medication_strength,
-            );
+
+            medicationCell.innerText =
+              formatMedication(
+                record.medication_name,
+                record.medication_strength
+              );
+
           }
+
 
           /*
            * Label
            */
 
-          const labelCell = document.createElement("td");
+          const labelCell =
+            document.createElement("td");
 
-          if (record.type === "QR") {
-            labelCell.innerText = record.label_product_id || "-";
+          if (
+            record.type === "QR"
+          ) {
+
+            labelCell.innerText =
+              record.label_product_id ||
+              "-";
+
           } else {
-            labelCell.innerText = formatMedication(
-              record.label_name,
-              record.label_strength,
-            );
+
+            labelCell.innerText =
+              formatMedication(
+                record.label_name,
+                record.label_strength
+              );
+
           }
+
 
           /*
            * Result
            */
 
-          const resultCell = document.createElement("td");
+          const resultCell =
+            document.createElement("td");
 
-          const resultBadge = document.createElement("span");
+          const resultBadge =
+            document.createElement(
+              "span"
+            );
 
-          resultBadge.classList.add("result-badge");
+          resultBadge.classList.add(
+            "result-badge"
+          );
 
-          if (record.match === true) {
-            resultBadge.classList.add("result-match");
+          if (
+            record.match === true
+          ) {
 
-            resultBadge.innerText = "MATCH";
+            resultBadge.classList.add(
+              "result-match"
+            );
+
+            resultBadge.innerText =
+              "MATCH";
+
           } else {
-            resultBadge.classList.add("result-no-match");
 
-            resultBadge.innerText = "DO NOT MATCH";
+            resultBadge.classList.add(
+              "result-no-match"
+            );
+
+            resultBadge.innerText =
+              "DO NOT MATCH";
+
           }
 
-          resultCell.appendChild(resultBadge);
+          resultCell.appendChild(
+            resultBadge
+          );
+
 
           /*
            * Confidence
            */
 
-          const confidenceCell = document.createElement("td");
+          const confidenceCell =
+            document.createElement("td");
 
-          confidenceCell.className = "confidence-text";
+          confidenceCell.className =
+            "confidence-text";
 
-          confidenceCell.innerText = record.confidence || "-";
+          confidenceCell.innerText =
+            record.confidence || "-";
+
 
           /*
            * Details
            */
 
-          const detailsCell = document.createElement("td");
+          const detailsCell =
+            document.createElement("td");
 
-          const detailsBtn = document.createElement("button");
+          const detailsBtn =
+            document.createElement(
+              "button"
+            );
 
-          detailsBtn.className = "details-btn";
+          detailsBtn.className =
+            "details-btn";
 
-          detailsBtn.innerText = "View";
+          detailsBtn.innerText =
+            "View";
 
-          detailsBtn.addEventListener("click", () => {
-            showHistoryDetails(record);
-          });
+          detailsBtn.addEventListener(
+            "click",
+            () => {
 
-          detailsCell.appendChild(detailsBtn);
+              showHistoryDetails(
+                record
+              );
+
+            }
+          );
+
+          detailsCell.appendChild(
+            detailsBtn
+          );
+
 
           /*
            * Add cells.
            */
 
-          row.appendChild(dateCell);
+          row.appendChild(
+            dateCell
+          );
 
-          row.appendChild(typeCell);
+          row.appendChild(
+            typeCell
+          );
 
-          row.appendChild(staffCell);
+          row.appendChild(
+            staffCell
+          );
 
-          row.appendChild(medicationCell);
+          row.appendChild(
+            medicationCell
+          );
 
-          row.appendChild(labelCell);
+          row.appendChild(
+            labelCell
+          );
 
-          row.appendChild(resultCell);
+          row.appendChild(
+            resultCell
+          );
 
-          row.appendChild(confidenceCell);
+          row.appendChild(
+            confidenceCell
+          );
 
-          row.appendChild(detailsCell);
+          row.appendChild(
+            detailsCell
+          );
 
-          historyTableBody.appendChild(row);
-        });
-      }
+          historyTableBody.appendChild(
+            row
+          );
 
-      /* =====================================================
-         FORMAT MEDICATION
-         ===================================================== */
-
-      function formatMedication(name, strength) {
-        const medicationName = name || "Unknown";
-
-        const medicationStrength = strength || "Unknown";
-
-        return medicationName + " (" + medicationStrength + ")";
-      }
-
-      /* =====================================================
-         FORMAT DATE / TIME
-         ===================================================== */
-
-      function formatDateTime(timestamp) {
-        if (!timestamp) {
-          return "-";
         }
+      );
 
-        const date = new Date(timestamp);
+    }
 
-        return date.toLocaleString("en-SG", {
+
+    /* =====================================================
+       FORMAT MEDICATION
+       ===================================================== */
+
+    function formatMedication(
+      name,
+      strength
+    ) {
+
+      const medicationName =
+        name || "Unknown";
+
+      const medicationStrength =
+        strength || "Unknown";
+
+      return (
+        medicationName +
+        " (" +
+        medicationStrength +
+        ")"
+      );
+
+    }
+
+
+    /* =====================================================
+       FORMAT DATE / TIME
+       ===================================================== */
+
+    function formatDateTime(
+      timestamp
+    ) {
+
+      if (!timestamp) {
+        return "-";
+      }
+
+      const date =
+        new Date(timestamp);
+
+      return date.toLocaleString(
+        "en-SG",
+        {
           dateStyle: "medium",
-
           timeStyle: "short",
-        });
-      }
-
-      /* =====================================================
-         SHOW HISTORY DETAILS
-         ===================================================== */
-
-      function showHistoryDetails(record) {
-        historyDetailContent.innerHTML = "";
-
-        /*
-         * Helper to safely create
-         * detail rows without using
-         * untrusted data as HTML.
-         */
-
-        function addDetail(label, value) {
-          const row = document.createElement("div");
-
-          row.className = "detail-row";
-
-          const labelElement = document.createElement("div");
-
-          labelElement.className = "detail-label";
-
-          labelElement.innerText = label;
-
-          const valueElement = document.createElement("div");
-
-          valueElement.className = "detail-value";
-
-          valueElement.innerText = value || "-";
-
-          row.appendChild(labelElement);
-
-          row.appendChild(valueElement);
-
-          historyDetailContent.appendChild(row);
         }
+      );
 
-        addDetail("Date / Time", formatDateTime(record.created_at));
+    }
 
-        addDetail("Staff ID", record.staff_id);
 
-        addDetail(
-          "Verification Type",
-          record.type === "QR" ? "📱 QR" : "🤖 AI",
+    /* =====================================================
+       SHOW HISTORY DETAILS
+       ===================================================== */
+
+    function showHistoryDetails(
+      record
+    ) {
+
+      historyDetailContent.innerHTML =
+        "";
+
+      /*
+       * Helper to safely create
+       * detail rows without using
+       * untrusted data as HTML.
+       */
+
+      function addDetail(
+        label,
+        value
+      ) {
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+        row.className =
+          "detail-row";
+
+        const labelElement =
+          document.createElement(
+            "div"
+          );
+
+        labelElement.className =
+          "detail-label";
+
+        labelElement.innerText =
+          label;
+
+        const valueElement =
+          document.createElement(
+            "div"
+          );
+
+        valueElement.className =
+          "detail-value";
+
+        valueElement.innerText =
+          value || "-";
+
+        row.appendChild(
+          labelElement
         );
 
-        if (record.type === "QR") {
-          addDetail("Medication Product ID", record.medication_product_id);
+        row.appendChild(
+          valueElement
+        );
 
-          addDetail("Label Product ID", record.label_product_id);
-        } else {
-          addDetail("Medication", record.medication_name);
+        historyDetailContent.appendChild(
+          row
+        );
 
-          addDetail("Medication Strength", record.medication_strength);
-
-          addDetail("Prescription Label", record.label_name);
-
-          addDetail("Label Strength", record.label_strength);
-        }
-
-        addDetail("Result", record.match ? "MATCH" : "DO NOT MATCH");
-
-        if (record.type === "AI") {
-          addDetail("Confidence", record.confidence);
-
-          addDetail("Reason", record.reason);
-        }
-
-        historyDetailBox.style.display = "block";
-
-        historyDetailBox.scrollIntoView({
-          behavior: "smooth",
-
-          block: "nearest",
-        });
       }
 
-      /* =====================================================
-         CLOSE HISTORY DETAILS
-         ===================================================== */
 
-      closeDetailBtn.addEventListener("click", () => {
-        historyDetailBox.style.display = "none";
+      addDetail(
+        "Date / Time",
+        formatDateTime(
+          record.created_at
+        )
+      );
+
+      addDetail(
+        "Staff ID",
+        record.staff_id
+      );
+
+      addDetail(
+        "Verification Type",
+        record.type === "QR"
+          ? "📱 QR"
+          : "🤖 AI"
+      );
+
+
+      if (
+        record.type === "QR"
+      ) {
+
+        addDetail(
+          "Medication Product ID",
+          record.medication_product_id
+        );
+
+        addDetail(
+          "Label Product ID",
+          record.label_product_id
+        );
+
+      } else {
+
+        addDetail(
+          "Medication",
+          record.medication_name
+        );
+
+        addDetail(
+          "Medication Strength",
+          record.medication_strength
+        );
+
+        addDetail(
+          "Prescription Label",
+          record.label_name
+        );
+
+        addDetail(
+          "Label Strength",
+          record.label_strength
+        );
+
+      }
+
+
+      addDetail(
+        "Result",
+        record.match
+          ? "MATCH"
+          : "DO NOT MATCH"
+      );
+
+
+      if (
+        record.type === "AI"
+      ) {
+
+        addDetail(
+          "Confidence",
+          record.confidence
+        );
+
+        addDetail(
+          "Reason",
+          record.reason
+        );
+
+      }
+
+
+      historyDetailBox.style.display =
+        "block";
+
+      historyDetailBox.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
       });
 
-      /* =====================================================
-         HISTORY FILTER EVENTS
-         ===================================================== */
+    }
 
-      historySearch.addEventListener("input", () => {
+
+    /* =====================================================
+       CLOSE HISTORY DETAILS
+       ===================================================== */
+
+    closeDetailBtn.addEventListener(
+      "click",
+      () => {
+
+        historyDetailBox.style.display =
+          "none";
+
+      }
+    );
+
+
+    /* =====================================================
+       HISTORY FILTER EVENTS
+       ===================================================== */
+
+    historySearch.addEventListener(
+      "input",
+      () => {
+
         renderScanHistory();
-      });
 
-      historyResultFilter.addEventListener("change", () => {
+      }
+    );
+
+
+    historyResultFilter.addEventListener(
+      "change",
+      () => {
+
         renderScanHistory();
-      });
 
-      historyTypeFilter.addEventListener("change", renderScanHistory);
+      }
+    );
 
-      /* =====================================================
-         PAGE EXIT
-         ===================================================== */
 
-      window.addEventListener("beforeunload", () => {
+    historyTypeFilter.addEventListener(
+      "change",
+      () => {
+
+        renderScanHistory();
+
+      }
+    );
+
+
+    /* =====================================================
+       PAGE EXIT
+       ===================================================== */
+
+    window.addEventListener(
+      "beforeunload",
+      () => {
+
         /*
          * Stop camera.
          */
@@ -2058,31 +2745,44 @@
          */
 
         medicationImage = null;
-
         labelImage = null;
-      });
 
-      /* =====================================================
-         INITIAL STATE
-         ===================================================== */
-
-      /*
-       * Camera intentionally does NOT start automatically.
-       *
-       * User must press "📷 Start Camera".
-       */
-
-      stopCamera();
-
-      // ==========================================================
-      // OPEN HISTORY FROM URL
-      // ==========================================================
-
-      const urlParams = new URLSearchParams(window.location.search);
-
-      if (urlParams.get("view") === "history") {
-        showHistoryBtn.click();
       }
-    </script>
-  </body>
+    );
+
+
+    /* =====================================================
+       INITIAL STATE
+       ===================================================== */
+
+    /*
+     * Camera intentionally does NOT start automatically.
+     *
+     * User must press "📷 Start Camera".
+     */
+
+    stopCamera();
+
+
+    /* =====================================================
+       OPEN HISTORY FROM URL
+       ===================================================== */
+
+    const urlParams =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    if (
+      urlParams.get("view") === "history"
+    ) {
+
+      openHistory();
+
+    }
+
+  </script>
+
+</body>
+
 </html>
