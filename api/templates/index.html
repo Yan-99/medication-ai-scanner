@@ -65,7 +65,45 @@
          ===================================================== */
 
       .top-navigation {
-        flex-shrink: 0;
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .nav-btn {
+        flex: 1;
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        background: #e5e7eb;
+        color: #111827;
+        border-radius: 8px;
+        padding: 11px 10px;
+        font-size: 14px;
+        font-weight: 600;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+      }
+
+      .nav-btn:hover {
+        background: #d1d5db;
+      }
+
+      .nav-btn.active {
+        background: #2563eb;
+        color: white;
+      }
+
+      @media (max-width: 520px) {
+        .top-navigation {
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .nav-btn {
+          padding: 12px 10px;
+        }
       }
 
       .history-nav-btn {
@@ -688,9 +726,11 @@
         </div>
 
         <div class="top-navigation">
-          <button id="show-history-btn" class="secondary-btn history-nav-btn">
-            📋 Scan History
-          </button>
+          <a href="/" class="nav-btn active"> 🤖 AI Verify </a>
+
+          <a href="/qr" class="nav-btn"> 📱 QR Verify </a>
+
+          <a href="/history" class="nav-btn"> 📋 Scan History </a>
         </div>
       </div>
 

@@ -227,6 +227,51 @@
       color: #b91c1c;
     }
 
+
+    /* =====================================================
+       PHASE 3.5A — APP NAVIGATION
+       ===================================================== */
+
+    .app-navigation {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      background: #e5e7eb;
+      color: #111827;
+      border-radius: 8px;
+      padding: 11px 10px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: #d1d5db;
+    }
+
+    .nav-btn.active {
+      background: #2563eb;
+      color: white;
+    }
+
+    @media (max-width: 520px) {
+      .app-navigation {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .nav-btn {
+        padding: 12px 10px;
+      }
+    }
+
     .hidden {
       display: none !important;
     }
@@ -248,6 +293,25 @@
 <body>
 
 <div class="container">
+
+  <!-- ===================================================== -->
+  <!-- APP NAVIGATION -->
+  <!-- ===================================================== -->
+
+  <nav class="app-navigation" aria-label="Main navigation">
+    <a href="/" class="nav-btn">
+      🤖 AI Verify
+    </a>
+
+    <a href="/qr" class="nav-btn active" aria-current="page">
+      📱 QR Verify
+    </a>
+
+    <a href="/history" class="nav-btn">
+      📋 Scan History
+    </a>
+  </nav>
+
 
   <!-- ===================================================== -->
   <!-- HEADER -->
@@ -479,13 +543,6 @@
     </div>
 
   </div>
-
-  <a
-    href="/"
-    class="back-link"
-  >
-    ← Back to Medication Verification
-  </a>
 
 </div>
 
