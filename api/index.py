@@ -300,7 +300,82 @@ Do not include any text outside the JSON object.
             "error": "An error occurred during medication verification."
         }), 500
 
+# ============================================================
+# SCANNING PRODUCT BARCODE/QR & MED LABEL BARCODE VERIFICATION
+# ============================================================
 
+@app.route("/qr")
+def qr_page():
+    return render_template("qr.html")
+
+# ============================================================
+# QR MEDICATION VERIFICATION
+# ============================================================
+
+@app.route("/qr-verify", methods=["POST"])
+def qr_verify():
+
+    data = request.get_json()
+
+    if (
+        not data
+        or "staffId" not in data
+        or "medicationProductId" not in data
+        or "labelProductId" not in data
+        or "match" not in data
+    ):
+        return jsonify({
+            "error": "Staff ID, medication product ID, label product ID, and match result are required."
+        }), 400
+
+    staff_id = data["staffId"]
+    medication_product_id = data["medicationProductId"]
+    label_product_id = data["labelProductId"]
+    match = data["match"]
+
+    # Make sure match is actually a boolean
+    if not isinstance(match, bool):
+        return jsonify({
+            "error": "Invalid match value."
+        }), 400
+
+    record = {
+        "staff_id": staff_id,
+        "medication_product_id": medication_product_id,
+        "label_product_id": label_product_id,
+        "match": match
+    }
+
+    try:
+
+        supabase_response = (
+            supabase
+            .table("qr_scan_records")
+            .insert(record)
+            .execute()
+        )
+
+        print(
+            "QR Supabase insert successful:",
+            supabase_response.data
+        )
+
+        return jsonify({
+            "success": True,
+            "record": supabase_response.data
+        })
+
+    except Exception as e:
+
+        print(
+            "QR Supabase error:",
+            repr(e)
+        )
+
+        return jsonify({
+            "error": "QR verification succeeded, but the audit record could not be saved."
+        }), 500
+        
 # ============================================================
 # SCAN HISTORY
 # ============================================================
@@ -334,14 +409,6 @@ def scan_history():
         return jsonify({
             "error": "Unable to retrieve scan history."
         }), 500
-
-# ============================================================
-# SCANNING PRODUCT BARCODE/QR & MED LABEL BARCODE VERIFICATION
-# ============================================================
-
-@app.route("/qr")
-def qr_page():
-    return render_template("qr.html")
 
 # ============================================================
 # VERCEL HANDLER

@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>QR Medication Verification</title>
 
-  <!-- QR SCANNER LIBRARY -->
+  <!-- QR Scanner Library -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
@@ -20,50 +16,40 @@
 
     body {
       margin: 0;
-      padding: 20px;
       font-family: Arial, sans-serif;
-      background: #f5f6f8;
-      color: #222;
+      background: #f5f7fa;
+      color: #1f2937;
     }
 
     .container {
-      max-width: 700px;
+      max-width: 600px;
       margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .card {
       background: white;
-      padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
     }
 
     h1 {
       margin-top: 0;
-      margin-bottom: 8px;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 21px;
     }
 
     .subtitle {
-      color: #666;
-      margin-bottom: 30px;
-      line-height: 1.5;
-    }
-
-    .step {
-      display: none;
-    }
-
-    .step.active {
-      display: block;
-    }
-
-    .step-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .step-description {
-      color: #666;
-      line-height: 1.5;
-      margin-bottom: 20px;
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 28px;
     }
 
     label {
@@ -75,355 +61,315 @@
     input {
       width: 100%;
       padding: 13px;
-      border: 1px solid #ccc;
+      border: 1px solid #d1d5db;
       border-radius: 8px;
       font-size: 16px;
-      margin-bottom: 15px;
+      margin-bottom: 16px;
     }
 
     button {
       width: 100%;
-      padding: 13px 16px;
       border: none;
       border-radius: 8px;
+      padding: 14px 18px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     .primary-btn {
-      background: #222;
+      background: #2563eb;
       color: white;
     }
 
+    .primary-btn:hover {
+      background: #1d4ed8;
+    }
+
     .secondary-btn {
-      background: #e9eaee;
-      color: #222;
+      background: #e5e7eb;
+      color: #111827;
     }
 
-    .reset-btn {
-      background: #f0f0f0;
-      color: #333;
-      margin-top: 25px;
+    .secondary-btn:hover {
+      background: #d1d5db;
     }
 
-    .error {
-      color: #c62828;
-      margin-top: 8px;
+    .success-btn {
+      background: #15803d;
+      color: white;
     }
 
-    .camera-container {
-      width: 100%;
-      background: #111;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 12px;
+    .success-btn:hover {
+      background: #166534;
     }
 
-    #qr-reader {
-      width: 100%;
+    .danger-btn {
+      background: #dc2626;
+      color: white;
     }
 
-    #qr-reader video {
-      width: 100% !important;
-      border-radius: 12px;
+    .danger-btn:hover {
+      background: #b91c1c;
     }
 
-    .camera-status {
-      text-align: center;
-      color: #666;
-      margin: 10px 0;
-      min-height: 22px;
-    }
-
-    .scan-result {
-      margin-top: 20px;
-      padding: 18px;
-      background: #f5f6f8;
-      border-radius: 12px;
-    }
-
-    .scan-result h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    .product-id {
-      font-size: 20px;
-      font-weight: 700;
-      word-break: break-all;
-    }
-
-    .result-box {
+    .step {
       display: none;
-      margin-top: 25px;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
     }
 
-    .result-box.match {
-      background: #e8f5e9;
-      border: 2px solid #4caf50;
-    }
-
-    .result-box.no-match {
-      background: #ffebee;
-      border: 2px solid #e53935;
-    }
-
-    .result-title {
-      font-size: 30px;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    .result-details {
-      line-height: 1.8;
-      word-break: break-word;
+    .step.active {
+      display: block;
     }
 
     .progress {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 30px;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 8px;
     }
 
     .progress-step {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      color: #666;
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 8px;
+      background: #e5e7eb;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 600;
     }
 
     .progress-step.active {
-      background: #222;
+      background: #2563eb;
       color: white;
     }
 
-    .progress-line {
-      width: 60px;
-      height: 3px;
-      background: #ddd;
+    .progress-step.completed {
+      background: #15803d;
+      color: white;
     }
 
-    .progress-line.active {
-      background: #222;
+    .scanner-container {
+      width: 100%;
+      margin-top: 16px;
+      border-radius: 12px;
+      overflow: hidden;
     }
 
-    .success-message {
-      color: #2e7d32;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-
-    .info-box {
-      padding: 15px;
-      background: #f5f6f8;
-      border-radius: 10px;
-      margin-top: 20px;
-      color: #555;
-      line-height: 1.5;
+    .scanner-status {
+      text-align: center;
+      color: #6b7280;
+      margin: 12px 0;
       font-size: 14px;
     }
 
-    @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
+    .captured-box {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 16px;
+      word-break: break-all;
+    }
 
-      .container {
-        padding: 20px;
-        border-radius: 12px;
-      }
+    .captured-label {
+      font-weight: 600;
+      color: #166534;
+      margin-bottom: 6px;
+    }
 
-      .result-title {
-        font-size: 26px;
-      }
+    .captured-value {
+      font-family: monospace;
+      font-size: 17px;
+    }
+
+    .result-box {
+      display: none;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .result-box.match {
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+    }
+
+    .result-box.no-match {
+      background: #fef2f2;
+      border: 2px solid #ef4444;
+    }
+
+    .result-title {
+      font-size: 25px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .result-details {
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .save-status {
+      text-align: center;
+      margin-top: 16px;
+      font-weight: 600;
+    }
+
+    .save-success {
+      color: #15803d;
+    }
+
+    .save-error {
+      color: #b91c1c;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #2563eb;
+      text-decoration: none;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+  <!-- ===================================================== -->
+  <!-- HEADER -->
+  <!-- ===================================================== -->
 
-    <h1>QR Medication Verification</h1>
+  <div class="card">
+
+    <h1>📱 QR Medication Verification</h1>
 
     <p class="subtitle">
-      Scan the product identifier on the medication and the
-      prescription label to check whether they match.
+      Verify a medication by comparing its product ID with the prescription label.
     </p>
 
-
-    <!-- =====================================================
-         PROGRESS INDICATOR
-         ===================================================== -->
+    <!-- =================================================== -->
+    <!-- PROGRESS -->
+    <!-- =================================================== -->
 
     <div class="progress">
 
-      <div
-        id="progress-1"
-        class="progress-step active"
-      >
-        1
+      <div id="progressStaff" class="progress-step active">
+        1. Staff
       </div>
 
-      <div
-        id="progress-line"
-        class="progress-line"
-      ></div>
+      <div id="progressMedication" class="progress-step">
+        2. Medication
+      </div>
 
-      <div
-        id="progress-2"
-        class="progress-step"
-      >
-        2
+      <div id="progressLabel" class="progress-step">
+        3. Label
+      </div>
+
+      <div id="progressResult" class="progress-step">
+        4. Result
       </div>
 
     </div>
 
 
-    <!-- =====================================================
-         STAFF ID
-         ===================================================== -->
+    <!-- =================================================== -->
+    <!-- STEP 1 — STAFF ID -->
+    <!-- =================================================== -->
 
-    <div
-      id="staff-screen"
-      class="step active"
-    >
+    <div id="staffStep" class="step active">
 
-      <div class="step-title">
-        Staff Identification
-      </div>
+      <h2>Enter Staff ID</h2>
 
-      <div class="step-description">
-        Please enter your Staff ID before starting QR verification.
-      </div>
-
-      <label for="staff-id">
+      <label for="staffId">
         Staff ID
       </label>
 
       <input
+        id="staffId"
         type="text"
-        id="staff-id"
-        placeholder="Enter your Staff ID"
+        placeholder="Enter staff ID"
         autocomplete="off"
-        maxlength="30"
-      />
+      >
 
       <button
-        id="start-btn"
+        id="startVerificationBtn"
         class="primary-btn"
       >
         Start Verification
       </button>
 
-      <div
-        id="staff-error"
-        class="error"
-        style="display: none;"
-      >
-        Please enter your Staff ID.
-      </div>
-
     </div>
 
 
-    <!-- =====================================================
-         STEP 1 — MEDICATION QR
-         ===================================================== -->
+    <!-- =================================================== -->
+    <!-- STEP 2 — MEDICATION QR -->
+    <!-- =================================================== -->
 
-    <div
-      id="medication-step"
-      class="step"
-    >
+    <div id="medicationStep" class="step">
 
-      <div class="step-title">
-        Step 1: Scan Medication QR
-      </div>
+      <h2>Scan Medication QR</h2>
 
-      <div class="step-description">
-        Position the QR code or barcode on the medication
-        packaging inside the camera view.
-      </div>
-
-
-      <!-- QR READER -->
-
-      <div class="camera-container">
-        <div id="qr-reader"></div>
-      </div>
+      <p>
+        Position the medication QR code inside the scanning box.
+      </p>
 
       <div
-        id="camera-status"
-        class="camera-status"
-      >
-        Camera is off.
-      </div>
+        id="qr-reader"
+        class="scanner-container"
+      ></div>
 
+      <p
+        id="medicationCameraStatus"
+        class="scanner-status"
+      >
+        Camera is stopped.
+      </p>
 
       <button
-        id="start-camera-btn"
+        id="startMedicationCameraBtn"
         class="primary-btn"
       >
-        📷 Start Camera
+        Start Camera
       </button>
 
       <button
-        id="stop-camera-btn"
-        class="secondary-btn"
-        style="display: none;"
+        id="stopMedicationCameraBtn"
+        class="danger-btn hidden"
       >
-        ⏹ Stop Camera
+        Stop Camera
       </button>
 
-
-      <!-- MEDICATION RESULT -->
-
       <div
-        id="medication-result"
-        class="scan-result"
-        style="display: none;"
+        id="medicationResult"
+        class="captured-box hidden"
       >
-
-        <h3>
+        <div class="captured-label">
           Medication Product ID
-        </h3>
-
-        <div
-          id="medication-id"
-          class="product-id"
-        ></div>
-
-        <div class="success-message">
-          ✓ Medication QR scanned successfully
         </div>
 
+        <div
+          id="medicationIdDisplay"
+          class="captured-value"
+        ></div>
       </div>
 
-
       <button
-        id="continue-label-btn"
-        class="primary-btn"
-        style="display: none;"
+        id="continueLabelBtn"
+        class="primary-btn hidden"
       >
         Scan Prescription Label QR →
       </button>
@@ -431,1005 +377,998 @@
     </div>
 
 
-    <!-- =====================================================
-         STEP 2 — LABEL QR
-         ===================================================== -->
+    <!-- =================================================== -->
+    <!-- STEP 3 — LABEL QR -->
+    <!-- =================================================== -->
 
-    <div
-      id="label-step"
-      class="step"
-    >
+    <div id="labelStep" class="step">
 
-      <div class="step-title">
-        Step 2: Scan Prescription Label QR
-      </div>
+      <h2>Scan Prescription Label QR</h2>
 
-      <div class="step-description">
-        Now position the QR code or barcode on the prescription
-        or cartfill label inside the camera view.
-      </div>
-
-
-      <!-- SAME QR READER -->
-
-      <div class="camera-container">
-        <div id="qr-reader-label"></div>
-      </div>
+      <p>
+        Position the prescription or cartfill label QR code inside the scanning box.
+      </p>
 
       <div
-        id="label-camera-status"
-        class="camera-status"
-      >
-        Camera is off.
-      </div>
+        id="qr-reader-label"
+        class="scanner-container"
+      ></div>
 
+      <p
+        id="labelCameraStatus"
+        class="scanner-status"
+      >
+        Camera is stopped.
+      </p>
 
       <button
-        id="start-label-camera-btn"
+        id="startLabelCameraBtn"
         class="primary-btn"
       >
-        📷 Scan Label QR
+        Start Camera
       </button>
 
       <button
-        id="stop-label-camera-btn"
-        class="secondary-btn"
-        style="display: none;"
+        id="stopLabelCameraBtn"
+        class="danger-btn hidden"
       >
-        ⏹ Stop Camera
+        Stop Camera
       </button>
 
-
-      <!-- LABEL RESULT -->
-
       <div
-        id="label-result"
-        class="scan-result"
-        style="display: none;"
+        id="labelResult"
+        class="captured-box hidden"
       >
-
-        <h3>
+        <div class="captured-label">
           Label Product ID
-        </h3>
-
-        <div
-          id="label-id"
-          class="product-id"
-        ></div>
-
-        <div class="success-message">
-          ✓ Prescription label QR scanned successfully
         </div>
 
+        <div
+          id="labelIdDisplay"
+          class="captured-value"
+        ></div>
       </div>
 
-
       <button
-        id="compare-btn"
-        class="primary-btn"
-        style="display: none;"
+        id="compareBtn"
+        class="success-btn hidden"
       >
-        🔍 Compare Product IDs
+        Compare Product IDs
       </button>
 
     </div>
 
 
-    <!-- =====================================================
-         FINAL RESULT
-         ===================================================== -->
+    <!-- =================================================== -->
+    <!-- STEP 4 — RESULT -->
+    <!-- =================================================== -->
 
-    <div
-      id="result-box"
-      class="result-box"
-    >
+    <div id="resultStep" class="step">
 
-      <div
-        id="result-title"
-        class="result-title"
-      ></div>
+      <h2>Verification Result</h2>
 
       <div
-        id="result-details"
-        class="result-details"
-      ></div>
+        id="resultBox"
+        class="result-box"
+      >
 
-    </div>
+        <div
+          id="resultTitle"
+          class="result-title"
+        ></div>
 
+        <div
+          id="resultDetails"
+          class="result-details"
+        ></div>
 
-    <!-- =====================================================
-         RESET
-         ===================================================== -->
+        <div
+          id="saveStatus"
+          class="save-status"
+        ></div>
 
-    <button
-      id="reset-btn"
-      class="reset-btn"
-      style="display: none;"
-    >
-      ↻ Start New Verification
-    </button>
+      </div>
 
-
-    <!-- =====================================================
-         INFORMATION
-         ===================================================== -->
-
-    <div class="info-box">
-
-      <strong>How this verification works:</strong>
-
-      <br /><br />
-
-      The product identifier encoded in the medication QR/barcode
-      is compared directly with the product identifier encoded in
-      the prescription label QR/barcode.
-
-      <br /><br />
-
-      No AI is used for this verification.
+      <button
+        id="resetBtn"
+        class="primary-btn"
+      >
+        New Verification
+      </button>
 
     </div>
 
   </div>
 
+  <a
+    href="/"
+    class="back-link"
+  >
+    ← Back to Medication Verification
+  </a>
 
-  <script>
-
-    /* =========================================================
-       APP STATE
-       ========================================================= */
-
-    let staffId = null;
-
-    let medicationId = null;
-
-    let labelId = null;
-
-    let medicationScanner = null;
-
-    let labelScanner = null;
-
-    let medicationScannerRunning = false;
-
-    let labelScannerRunning = false;
+</div>
 
 
-    /* =========================================================
-       ELEMENTS
-       ========================================================= */
+<script>
 
-    const staffScreen =
-      document.getElementById("staff-screen");
+  // ==========================================================
+  // STATE
+  // ==========================================================
 
-    const medicationStep =
-      document.getElementById("medication-step");
+  let staffId = null;
 
-    const labelStep =
-      document.getElementById("label-step");
+  let medicationId = null;
 
-    const staffInput =
-      document.getElementById("staff-id");
+  let labelId = null;
 
-    const staffError =
-      document.getElementById("staff-error");
+  let medicationScanner = null;
 
-    const startBtn =
-      document.getElementById("start-btn");
+  let labelScanner = null;
 
-    const startCameraBtn =
-      document.getElementById("start-camera-btn");
+  let medicationScannerRunning = false;
 
-    const stopCameraBtn =
-      document.getElementById("stop-camera-btn");
-
-    const startLabelCameraBtn =
-      document.getElementById(
-        "start-label-camera-btn"
-      );
-
-    const stopLabelCameraBtn =
-      document.getElementById(
-        "stop-label-camera-btn"
-      );
-
-    const continueLabelBtn =
-      document.getElementById(
-        "continue-label-btn"
-      );
-
-    const compareBtn =
-      document.getElementById(
-        "compare-btn"
-      );
-
-    const resetBtn =
-      document.getElementById(
-        "reset-btn"
-      );
-
-    const medicationResult =
-      document.getElementById(
-        "medication-result"
-      );
-
-    const labelResult =
-      document.getElementById(
-        "label-result"
-      );
-
-    const medicationIdDisplay =
-      document.getElementById(
-        "medication-id"
-      );
-
-    const labelIdDisplay =
-      document.getElementById(
-        "label-id"
-      );
-
-    const cameraStatus =
-      document.getElementById(
-        "camera-status"
-      );
-
-    const labelCameraStatus =
-      document.getElementById(
-        "label-camera-status"
-      );
-
-    const resultBox =
-      document.getElementById(
-        "result-box"
-      );
-
-    const resultTitle =
-      document.getElementById(
-        "result-title"
-      );
-
-    const resultDetails =
-      document.getElementById(
-        "result-details"
-      );
-
-    const progress1 =
-      document.getElementById(
-        "progress-1"
-      );
-
-    const progress2 =
-      document.getElementById(
-        "progress-2"
-      );
-
-    const progressLine =
-      document.getElementById(
-        "progress-line"
-      );
+  let labelScannerRunning = false;
 
 
-    /* =========================================================
-       START VERIFICATION
-       ========================================================= */
+  // ==========================================================
+  // ELEMENTS
+  // ==========================================================
 
-    startBtn.addEventListener(
-      "click",
-      () => {
+  const staffStep = document.getElementById("staffStep");
 
-        const enteredStaffId =
-          staffInput.value.trim();
+  const medicationStep = document.getElementById("medicationStep");
 
-        if (!enteredStaffId) {
+  const labelStep = document.getElementById("labelStep");
 
-          staffError.style.display =
-            "block";
+  const resultStep = document.getElementById("resultStep");
 
-          return;
-        }
+  const staffIdInput = document.getElementById("staffId");
 
-        staffId = enteredStaffId;
+  const startVerificationBtn =
+    document.getElementById("startVerificationBtn");
 
-        staffError.style.display =
-          "none";
+  const startMedicationCameraBtn =
+    document.getElementById("startMedicationCameraBtn");
 
-        staffScreen.classList.remove(
-          "active"
-        );
+  const stopMedicationCameraBtn =
+    document.getElementById("stopMedicationCameraBtn");
 
-        medicationStep.classList.add(
-          "active"
-        );
+  const startLabelCameraBtn =
+    document.getElementById("startLabelCameraBtn");
 
-        progress1.classList.add(
-          "active"
-        );
+  const stopLabelCameraBtn =
+    document.getElementById("stopLabelCameraBtn");
 
-        progress2.classList.remove(
-          "active"
-        );
+  const continueLabelBtn =
+    document.getElementById("continueLabelBtn");
 
-        progressLine.classList.remove(
-          "active"
-        );
+  const compareBtn =
+    document.getElementById("compareBtn");
 
-      }
+  const resetBtn =
+    document.getElementById("resetBtn");
+
+  const medicationResult =
+    document.getElementById("medicationResult");
+
+  const labelResult =
+    document.getElementById("labelResult");
+
+  const medicationIdDisplay =
+    document.getElementById("medicationIdDisplay");
+
+  const labelIdDisplay =
+    document.getElementById("labelIdDisplay");
+
+  const medicationCameraStatus =
+    document.getElementById("medicationCameraStatus");
+
+  const labelCameraStatus =
+    document.getElementById("labelCameraStatus");
+
+  const resultBox =
+    document.getElementById("resultBox");
+
+  const resultTitle =
+    document.getElementById("resultTitle");
+
+  const resultDetails =
+    document.getElementById("resultDetails");
+
+  const saveStatus =
+    document.getElementById("saveStatus");
+
+
+  // ==========================================================
+  // PROGRESS ELEMENTS
+  // ==========================================================
+
+  const progressStaff =
+    document.getElementById("progressStaff");
+
+  const progressMedication =
+    document.getElementById("progressMedication");
+
+  const progressLabel =
+    document.getElementById("progressLabel");
+
+  const progressResult =
+    document.getElementById("progressResult");
+
+
+  // ==========================================================
+  // HELPER — SHOW STEP
+  // ==========================================================
+
+  function showStep(step) {
+
+    staffStep.classList.remove("active");
+    medicationStep.classList.remove("active");
+    labelStep.classList.remove("active");
+    resultStep.classList.remove("active");
+
+    step.classList.add("active");
+
+  }
+
+
+  // ==========================================================
+  // HELPER — UPDATE PROGRESS
+  // ==========================================================
+
+  function updateProgress(currentStep) {
+
+    progressStaff.classList.remove(
+      "active",
+      "completed"
+    );
+
+    progressMedication.classList.remove(
+      "active",
+      "completed"
+    );
+
+    progressLabel.classList.remove(
+      "active",
+      "completed"
+    );
+
+    progressResult.classList.remove(
+      "active",
+      "completed"
     );
 
 
-    /* =========================================================
-       ENTER KEY SUPPORT
-       ========================================================= */
+    if (currentStep === 1) {
 
-    staffInput.addEventListener(
-      "keydown",
-      (event) => {
+      progressStaff.classList.add("active");
 
-        if (event.key === "Enter") {
+    }
 
-          startBtn.click();
+    if (currentStep === 2) {
 
-        }
+      progressStaff.classList.add("completed");
 
-      }
-    );
+      progressMedication.classList.add("active");
+
+    }
+
+    if (currentStep === 3) {
+
+      progressStaff.classList.add("completed");
+
+      progressMedication.classList.add("completed");
+
+      progressLabel.classList.add("active");
+
+    }
+
+    if (currentStep === 4) {
+
+      progressStaff.classList.add("completed");
+
+      progressMedication.classList.add("completed");
+
+      progressLabel.classList.add("completed");
+
+      progressResult.classList.add("active");
+
+    }
+
+  }
 
 
-    /* =========================================================
-       START MEDICATION SCANNER
-       ========================================================= */
+  // ==========================================================
+  // HELPER — HTML ESCAPING
+  // ==========================================================
 
-    async function startMedicationScanner() {
+  function escapeHtml(value) {
 
-      if (medicationScannerRunning) {
+    const div = document.createElement("div");
+
+    div.innerText = value;
+
+    return div.innerHTML;
+
+  }
+
+
+  // ==========================================================
+  // STEP 1 — START VERIFICATION
+  // ==========================================================
+
+  startVerificationBtn.addEventListener(
+    "click",
+    () => {
+
+      const enteredStaffId =
+        staffIdInput.value.trim();
+
+      if (!enteredStaffId) {
+
+        alert("Please enter your Staff ID.");
+
         return;
-      }
-
-      cameraStatus.innerText =
-        "Starting camera...";
-
-      try {
-
-        medicationScanner =
-          new Html5Qrcode(
-            "qr-reader"
-          );
-
-        await medicationScanner.start(
-          {
-            facingMode: {
-              exact: "environment"
-            }
-          },
-          {
-            fps: 5,
-            qrbox: {
-              width: 250,
-              height: 250
-            },
-            aspectRatio: 1.0
-          },
-          handleMedicationScan,
-          () => {
-            // Ignore normal scan failures while
-            // the camera is looking for a QR code.
-          }
-        );
-
-        medicationScannerRunning =
-          true;
-
-        cameraStatus.innerText =
-          "Camera is active. Position the QR code inside the box.";
-
-        startCameraBtn.style.display =
-          "none";
-
-        stopCameraBtn.style.display =
-          "block";
-
-      } catch (error) {
-
-        console.error(
-          "Medication camera error:",
-          error
-        );
-
-        cameraStatus.innerText =
-          "Unable to access the camera.";
-
-        cameraStatus.className =
-          "camera-status error";
-
-        medicationScannerRunning =
-          false;
 
       }
+
+      staffId = enteredStaffId;
+
+      showStep(medicationStep);
+
+      updateProgress(2);
+
+      medicationCameraStatus.innerText =
+        "Camera is stopped.";
+
+    }
+  );
+
+
+  // ==========================================================
+  // MEDICATION CAMERA — START
+  // ==========================================================
+
+  async function startMedicationScanner() {
+
+    if (medicationScannerRunning) {
+
+      return;
 
     }
 
 
-    /* =========================================================
-       MEDICATION QR DETECTED
-       ========================================================= */
+    try {
 
-    async function handleMedicationScan(
-      decodedText
+      medicationScanner =
+        new Html5Qrcode("qr-reader");
+
+
+      await medicationScanner.start(
+
+        {
+          facingMode: "environment"
+        },
+
+        {
+          fps: 5,
+
+          qrbox: {
+            width: 250,
+            height: 250
+          },
+
+          aspectRatio: 1.0
+
+        },
+
+        handleMedicationScan,
+
+        () => {}
+
+      );
+
+
+      medicationScannerRunning = true;
+
+      startMedicationCameraBtn.classList.add("hidden");
+
+      stopMedicationCameraBtn.classList.remove("hidden");
+
+      medicationCameraStatus.innerText =
+        "Camera is scanning...";
+
+
+    } catch (error) {
+
+      console.error(
+        "Medication camera error:",
+        error
+      );
+
+      medicationCameraStatus.innerText =
+        "Unable to start camera. Please check camera permissions.";
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // MEDICATION CAMERA — STOP
+  // ==========================================================
+
+  async function stopMedicationScanner() {
+
+    if (
+      !medicationScanner ||
+      !medicationScannerRunning
     ) {
 
-      if (!decodedText) {
+      return;
+
+    }
+
+
+    try {
+
+      await medicationScanner.stop();
+
+    } catch (error) {
+
+      console.warn(
+        "Medication scanner stop warning:",
+        error
+      );
+
+    }
+
+
+    medicationScannerRunning = false;
+
+    startMedicationCameraBtn.classList.remove("hidden");
+
+    stopMedicationCameraBtn.classList.add("hidden");
+
+  }
+
+
+  // ==========================================================
+  // MEDICATION QR DETECTED
+  // ==========================================================
+
+  async function handleMedicationScan(decodedText) {
+
+    if (!decodedText) {
+
+      return;
+
+    }
+
+    if (medicationId !== null) {
+
+      return;
+
+    }
+
+
+    medicationId =
+      decodedText.trim();
+
+
+    medicationIdDisplay.innerText =
+      medicationId;
+
+
+    medicationResult.classList.remove(
+      "hidden"
+    );
+
+
+    await stopMedicationScanner();
+
+
+    medicationCameraStatus.innerText =
+      "Medication QR captured.";
+
+
+    continueLabelBtn.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  // ==========================================================
+  // MEDICATION CAMERA BUTTONS
+  // ==========================================================
+
+  startMedicationCameraBtn.addEventListener(
+    "click",
+    startMedicationScanner
+  );
+
+
+  stopMedicationCameraBtn.addEventListener(
+    "click",
+    async () => {
+
+      await stopMedicationScanner();
+
+      medicationCameraStatus.innerText =
+        "Camera stopped.";
+
+    }
+  );
+
+
+  // ==========================================================
+  // MOVE TO LABEL SCAN
+  // ==========================================================
+
+  continueLabelBtn.addEventListener(
+    "click",
+    async () => {
+
+      if (!medicationId) {
+
         return;
+
       }
 
-      /*
-       * Prevent the same QR from being
-       * processed multiple times.
-       */
-
-      if (medicationId !== null) {
-        return;
-      }
-
-      medicationId =
-        decodedText.trim();
-
-      medicationIdDisplay.innerText =
-        medicationId;
-
-      medicationResult.style.display =
-        "block";
-
-
-      /*
-       * IMPORTANT:
-       * Stop the scanner immediately.
-       */
 
       await stopMedicationScanner();
 
 
-      cameraStatus.innerText =
-        "Medication QR captured.";
+      showStep(labelStep);
 
-      continueLabelBtn.style.display =
-        "block";
+      updateProgress(3);
 
-    }
-
-
-    /* =========================================================
-       STOP MEDICATION SCANNER
-       ========================================================= */
-
-    async function stopMedicationScanner() {
-
-      if (
-        !medicationScanner ||
-        !medicationScannerRunning
-      ) {
-        return;
-      }
-
-      try {
-
-        await medicationScanner.stop();
-
-      } catch (error) {
-
-        console.warn(
-          "Medication scanner stop warning:",
-          error
-        );
-
-      }
-
-      try {
-
-        medicationScanner.clear();
-
-      } catch (error) {
-
-        console.warn(
-          "Medication scanner clear warning:",
-          error
-        );
-
-      }
-
-      medicationScanner =
-        null;
-
-      medicationScannerRunning =
-        false;
-
-      startCameraBtn.style.display =
-        "block";
-
-      stopCameraBtn.style.display =
-        "none";
-
-    }
-
-
-    /* =========================================================
-       START MEDICATION CAMERA BUTTON
-       ========================================================= */
-
-    startCameraBtn.addEventListener(
-      "click",
-      async () => {
-
-        await startMedicationScanner();
-
-      }
-    );
-
-
-    /* =========================================================
-       STOP MEDICATION CAMERA BUTTON
-       ========================================================= */
-
-    stopCameraBtn.addEventListener(
-      "click",
-      async () => {
-
-        await stopMedicationScanner();
-
-        cameraStatus.innerText =
-          "Camera is off.";
-
-      }
-    );
-
-
-    /* =========================================================
-       MOVE TO LABEL STEP
-       ========================================================= */
-
-    continueLabelBtn.addEventListener(
-      "click",
-      () => {
-
-        medicationStep.classList.remove(
-          "active"
-        );
-
-        labelStep.classList.add(
-          "active"
-        );
-
-        progress2.classList.add(
-          "active"
-        );
-
-        progressLine.classList.add(
-          "active"
-        );
-
-        labelCameraStatus.innerText =
-          "Camera is off.";
-
-        startLabelCameraBtn.style.display =
-          "block";
-
-        stopLabelCameraBtn.style.display =
-          "none";
-
-      }
-    );
-
-
-    /* =========================================================
-       START LABEL SCANNER
-       ========================================================= */
-
-    async function startLabelScanner() {
-
-      if (labelScannerRunning) {
-        return;
-      }
 
       labelCameraStatus.innerText =
-        "Starting camera...";
+        "Camera is stopped.";
 
-      try {
+    }
+  );
 
-        labelScanner =
-          new Html5Qrcode(
-            "qr-reader-label"
-          );
 
-        await labelScanner.start(
-          {
-            facingMode: {
-              exact: "environment"
-            }
-          },
-          {
-            fps: 5,
-            qrbox: {
-              width: 250,
-              height: 250
-            },
-            aspectRatio: 1.0
-          },
-          handleLabelScan,
-          () => {
-            // Ignore normal scan failures.
-          }
-        );
+  // ==========================================================
+  // LABEL CAMERA — START
+  // ==========================================================
 
-        labelScannerRunning =
-          true;
+  async function startLabelScanner() {
 
-        labelCameraStatus.innerText =
-          "Camera is active. Position the QR code inside the box.";
+    if (labelScannerRunning) {
 
-        startLabelCameraBtn.style.display =
-          "none";
-
-        stopLabelCameraBtn.style.display =
-          "block";
-
-      } catch (error) {
-
-        console.error(
-          "Label camera error:",
-          error
-        );
-
-        labelCameraStatus.innerText =
-          "Unable to access the camera.";
-
-        labelCameraStatus.className =
-          "camera-status error";
-
-        labelScannerRunning =
-          false;
-
-      }
+      return;
 
     }
 
 
-    /* =========================================================
-       LABEL QR DETECTED
-       ========================================================= */
+    try {
 
-    async function handleLabelScan(
-      decodedText
+      labelScanner =
+        new Html5Qrcode("qr-reader-label");
+
+
+      await labelScanner.start(
+
+        {
+          facingMode: "environment"
+        },
+
+        {
+          fps: 5,
+
+          qrbox: {
+            width: 250,
+            height: 250
+          },
+
+          aspectRatio: 1.0
+
+        },
+
+        handleLabelScan,
+
+        () => {}
+
+      );
+
+
+      labelScannerRunning = true;
+
+      startLabelCameraBtn.classList.add("hidden");
+
+      stopLabelCameraBtn.classList.remove("hidden");
+
+      labelCameraStatus.innerText =
+        "Camera is scanning...";
+
+
+    } catch (error) {
+
+      console.error(
+        "Label camera error:",
+        error
+      );
+
+      labelCameraStatus.innerText =
+        "Unable to start camera. Please check camera permissions.";
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // LABEL CAMERA — STOP
+  // ==========================================================
+
+  async function stopLabelScanner() {
+
+    if (
+      !labelScanner ||
+      !labelScannerRunning
     ) {
 
-      if (!decodedText) {
-        return;
-      }
+      return;
 
-      /*
-       * Prevent repeated processing.
-       */
-
-      if (labelId !== null) {
-        return;
-      }
-
-      labelId =
-        decodedText.trim();
-
-      labelIdDisplay.innerText =
-        labelId;
-
-      labelResult.style.display =
-        "block";
+    }
 
 
-      /*
-       * Stop camera immediately.
-       */
+    try {
+
+      await labelScanner.stop();
+
+    } catch (error) {
+
+      console.warn(
+        "Label scanner stop warning:",
+        error
+      );
+
+    }
+
+
+    labelScannerRunning = false;
+
+    startLabelCameraBtn.classList.remove("hidden");
+
+    stopLabelCameraBtn.classList.add("hidden");
+
+  }
+
+
+  // ==========================================================
+  // LABEL QR DETECTED
+  // ==========================================================
+
+  async function handleLabelScan(decodedText) {
+
+    if (!decodedText) {
+
+      return;
+
+    }
+
+    if (labelId !== null) {
+
+      return;
+
+    }
+
+
+    labelId =
+      decodedText.trim();
+
+
+    labelIdDisplay.innerText =
+      labelId;
+
+
+    labelResult.classList.remove(
+      "hidden"
+    );
+
+
+    await stopLabelScanner();
+
+
+    labelCameraStatus.innerText =
+      "Prescription label QR captured.";
+
+
+    compareBtn.classList.remove(
+      "hidden"
+    );
+
+  }
+
+
+  // ==========================================================
+  // LABEL CAMERA BUTTONS
+  // ==========================================================
+
+  startLabelCameraBtn.addEventListener(
+    "click",
+    startLabelScanner
+  );
+
+
+  stopLabelCameraBtn.addEventListener(
+    "click",
+    async () => {
 
       await stopLabelScanner();
 
       labelCameraStatus.innerText =
-        "Prescription label QR captured.";
-
-      compareBtn.style.display =
-        "block";
+        "Camera stopped.";
 
     }
+  );
 
 
-    /* =========================================================
-       STOP LABEL SCANNER
-       ========================================================= */
+  // ==========================================================
+  // COMPARE + SAVE TO SUPABASE
+  // ==========================================================
 
-    async function stopLabelScanner() {
+  compareBtn.addEventListener(
+    "click",
+    async () => {
 
-      if (
-        !labelScanner ||
-        !labelScannerRunning
-      ) {
+      if (!medicationId || !labelId) {
+
         return;
-      }
-
-      try {
-
-        await labelScanner.stop();
-
-      } catch (error) {
-
-        console.warn(
-          "Label scanner stop warning:",
-          error
-        );
 
       }
 
-      try {
 
-        labelScanner.clear();
+      // ------------------------------------------------------
+      // STEP 1 — COMPARE PRODUCT IDS
+      // ------------------------------------------------------
 
-      } catch (error) {
+      const match =
+        medicationId === labelId;
 
-        console.warn(
-          "Label scanner clear warning:",
-          error
-        );
 
-      }
+      // ------------------------------------------------------
+      // STEP 2 — DISPLAY RESULT
+      // ------------------------------------------------------
 
-      labelScanner =
-        null;
+      resultBox.className =
+        "result-box " +
+        (match ? "match" : "no-match");
 
-      labelScannerRunning =
-        false;
 
-      startLabelCameraBtn.style.display =
+      resultBox.style.display =
         "block";
 
-      stopLabelCameraBtn.style.display =
-        "none";
 
-    }
-
-
-    /* =========================================================
-       START LABEL CAMERA BUTTON
-       ========================================================= */
-
-    startLabelCameraBtn.addEventListener(
-      "click",
-      async () => {
-
-        await startLabelScanner();
-
-      }
-    );
+      resultTitle.innerText =
+        match
+          ? "✅ MATCH"
+          : "❌ DO NOT MATCH";
 
 
-    /* =========================================================
-       STOP LABEL CAMERA BUTTON
-       ========================================================= */
+      resultDetails.innerHTML = `
 
-    stopLabelCameraBtn.addEventListener(
-      "click",
-      async () => {
+        <strong>Medication Product ID:</strong>
 
-        await stopLabelScanner();
+        <br>
 
-        labelCameraStatus.innerText =
-          "Camera is off.";
+        ${escapeHtml(medicationId)}
 
-      }
-    );
+        <br><br>
 
+        <strong>Label Product ID:</strong>
 
-    /* =========================================================
-       COMPARE PRODUCT IDs
-       ========================================================= */
+        <br>
 
-    compareBtn.addEventListener(
-      "click",
-      () => {
+        ${escapeHtml(labelId)}
 
-        if (
-          !medicationId ||
-          !labelId
-        ) {
-
-          return;
-
-        }
-
-        const match =
-          medicationId === labelId;
+      `;
 
 
-        resultBox.className =
-          "result-box " +
-          (
-            match
-              ? "match"
-              : "no-match"
+      saveStatus.innerText =
+        "Saving verification...";
+
+      saveStatus.className =
+        "save-status";
+
+
+      // ------------------------------------------------------
+      // STEP 3 — MOVE TO RESULT SCREEN
+      // ------------------------------------------------------
+
+      showStep(resultStep);
+
+      updateProgress(4);
+
+
+      // ------------------------------------------------------
+      // STEP 4 — SAVE TO FLASK / SUPABASE
+      // ------------------------------------------------------
+
+      try {
+
+        const response =
+          await fetch(
+            "/qr-verify",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                staffId: staffId,
+
+                medicationProductId:
+                  medicationId,
+
+                labelProductId:
+                  labelId,
+
+                match: match
+
+              })
+
+            }
           );
 
-        resultBox.style.display =
-          "block";
+
+        const data =
+          await response.json();
 
 
-        if (match) {
+        if (!response.ok) {
 
-          resultTitle.innerText =
-            "✅ MATCH";
-
-        } else {
-
-          resultTitle.innerText =
-            "❌ DO NOT MATCH";
+          throw new Error(
+            data.error ||
+            "Unable to save QR verification."
+          );
 
         }
 
 
-        resultDetails.innerHTML =
-          `
-          <strong>Medication Product ID:</strong>
-          <br>
-          ${escapeHtml(medicationId)}
-          <br><br>
-
-          <strong>Label Product ID:</strong>
-          <br>
-          ${escapeHtml(labelId)}
-          `;
+        console.log(
+          "QR verification saved:",
+          data
+        );
 
 
-        compareBtn.style.display =
-          "none";
+        // ----------------------------------------------------
+        // SAVE SUCCESS
+        // ----------------------------------------------------
 
-        resetBtn.style.display =
-          "block";
+        saveStatus.innerText =
+          "✓ Verification recorded successfully.";
 
-        resultBox.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
+        saveStatus.className =
+          "save-status save-success";
+
+
+      } catch (error) {
+
+        console.error(
+          "QR verification save error:",
+          error
+        );
+
+
+        // ----------------------------------------------------
+        // SAVE FAILURE
+        // ----------------------------------------------------
+
+        saveStatus.innerText =
+          "⚠ Verification completed, but the record could not be saved.";
+
+        saveStatus.className =
+          "save-status save-error";
 
       }
-    );
-
-
-    /* =========================================================
-       ESCAPE HTML
-       ========================================================= */
-
-    function escapeHtml(value) {
-
-      return String(value)
-        .replace(
-          /&/g,
-          "&amp;"
-        )
-        .replace(
-          /</g,
-          "&lt;"
-        )
-        .replace(
-          />/g,
-          "&gt;"
-        )
-        .replace(
-          /"/g,
-          "&quot;"
-        )
-        .replace(
-          /'/g,
-          "&#039;"
-        );
 
     }
+  );
 
 
-    /* =========================================================
-       RESET
-       ========================================================= */
+  // ==========================================================
+  // RESET
+  // ==========================================================
 
-    resetBtn.addEventListener(
-      "click",
-      async () => {
+  resetBtn.addEventListener(
+    "click",
+    async () => {
 
-        await stopMedicationScanner();
+      await stopMedicationScanner();
 
-        await stopLabelScanner();
-
-        staffId = null;
-
-        medicationId = null;
-
-        labelId = null;
+      await stopLabelScanner();
 
 
-        staffInput.value = "";
+      staffId = null;
+
+      medicationId = null;
+
+      labelId = null;
 
 
-        medicationIdDisplay.innerText =
-          "";
+      medicationScanner = null;
 
-        labelIdDisplay.innerText =
-          "";
+      labelScanner = null;
 
 
-        medicationResult.style.display =
-          "none";
-
-        labelResult.style.display =
-          "none";
-
-        resultBox.style.display =
-          "none";
-
-        continueLabelBtn.style.display =
-          "none";
-
-        compareBtn.style.display =
-          "none";
-
-        resetBtn.style.display =
-          "none";
+      staffIdInput.value = "";
 
 
-        cameraStatus.innerText =
-          "Camera is off.";
+      medicationIdDisplay.innerText = "";
 
-        labelCameraStatus.innerText =
-          "Camera is off.";
+      labelIdDisplay.innerText = "";
 
 
-        staffError.style.display =
-          "none";
+      medicationResult.classList.add(
+        "hidden"
+      );
+
+      labelResult.classList.add(
+        "hidden"
+      );
 
 
-        medicationStep.classList.remove(
-          "active"
-        );
+      continueLabelBtn.classList.add(
+        "hidden"
+      );
 
-        labelStep.classList.remove(
-          "active"
-        );
-
-        staffScreen.classList.add(
-          "active"
-        );
+      compareBtn.classList.add(
+        "hidden"
+      );
 
 
-        progress1.classList.add(
-          "active"
-        );
-
-        progress2.classList.remove(
-          "active"
-        );
-
-        progressLine.classList.remove(
-          "active"
-        );
-
-      }
-    );
+      resultBox.style.display =
+        "none";
 
 
-    /* =========================================================
-       CLEAN UP CAMERA IF PAGE IS CLOSED
-       ========================================================= */
+      saveStatus.innerText = "";
 
-    window.addEventListener(
-      "beforeunload",
-      async () => {
+      saveStatus.className =
+        "save-status";
 
-        await stopMedicationScanner();
 
-        await stopLabelScanner();
+      medicationCameraStatus.innerText =
+        "Camera is stopped.";
 
-      }
-    );
+      labelCameraStatus.innerText =
+        "Camera is stopped.";
 
-  </script>
+
+      showStep(staffStep);
+
+      updateProgress(1);
+
+    }
+  );
+
+
+  // ==========================================================
+  // CLEAN UP CAMERA WHEN LEAVING PAGE
+  // ==========================================================
+
+  window.addEventListener(
+    "beforeunload",
+    async () => {
+
+      await stopMedicationScanner();
+
+      await stopLabelScanner();
+
+    }
+  );
+
+</script>
 
 </body>
 </html>
