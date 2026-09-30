@@ -1647,12 +1647,6 @@
         loadScanHistory();
       });
 
-      const urlParams = new URLSearchParams(window.location.search);
-
-      if (urlParams.get("view") === "history") {
-        showHistoryBtn.click();
-      }
-
       /* =====================================================
          RETURN TO VERIFICATION
          ===================================================== */
@@ -2087,7 +2081,7 @@
       const urlParams = new URLSearchParams(window.location.search);
 
       if (urlParams.get("view") === "history") {
-        showHistoryScreen();
+        showHistoryBtn.click();
       }
     </script>
   </body>
