@@ -339,7 +339,7 @@ def scan_history():
 # SCANNING PRODUCT BARCODE/QR & MED LABEL BARCODE VERIFICATION
 # ============================================================
 
-@app.route("/")
+@app.route("/qr")
 def qr_page():
     return render_template("qr.html")
 
