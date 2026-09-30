@@ -385,8 +385,11 @@ def scan_history():
 
     try:
 
-        # Retrieve scan records from Supabase
-        response = (
+        # ------------------------------------------------------
+        # GET AI VERIFICATION RECORDS
+        # ------------------------------------------------------
+
+        ai_response = (
             supabase
             .table("scan_records")
             .select("*")
@@ -395,9 +398,126 @@ def scan_history():
             .execute()
         )
 
+        ai_records = []
+
+        for record in ai_response.data:
+
+            ai_records.append({
+                "id": record.get("id"),
+                "created_at": record.get("created_at"),
+                "type": "AI",
+
+                "staff_id": record.get("staff_id"),
+
+                "medication_name":
+                    record.get("medication_name"),
+
+                "medication_strength":
+                    record.get("medication_strength"),
+
+                "label_name":
+                    record.get("label_name"),
+
+                "label_strength":
+                    record.get("label_strength"),
+
+                "medication_product_id": None,
+
+                "label_product_id": None,
+
+                "match": record.get("match"),
+
+                "confidence":
+                    record.get("confidence"),
+
+                "reason":
+                    record.get("reason")
+            })
+
+
+        # ------------------------------------------------------
+        # GET QR VERIFICATION RECORDS
+        # ------------------------------------------------------
+
+        qr_response = (
+            supabase
+            .table("qr_scan_records")
+            .select("*")
+            .order("created_at", desc=True)
+            .limit(100)
+            .execute()
+        )
+
+        qr_records = []
+
+        for record in qr_response.data:
+
+            qr_records.append({
+                "id": record.get("id"),
+                "created_at": record.get("created_at"),
+                "type": "QR",
+
+                "staff_id": record.get("staff_id"),
+
+                "medication_name": None,
+
+                "medication_strength": None,
+
+                "label_name": None,
+
+                "label_strength": None,
+
+                "medication_product_id":
+                    record.get(
+                        "medication_product_id"
+                    ),
+
+                "label_product_id":
+                    record.get(
+                        "label_product_id"
+                    ),
+
+                "match":
+                    record.get("match"),
+
+                "confidence": None,
+
+                "reason": None
+            })
+
+
+        # ------------------------------------------------------
+        # COMBINE BOTH TYPES
+        # ------------------------------------------------------
+
+        combined_records = (
+            ai_records +
+            qr_records
+        )
+
+
+        # ------------------------------------------------------
+        # SORT BY DATE
+        # ------------------------------------------------------
+
+        combined_records.sort(
+            key=lambda record:
+                record.get("created_at") or "",
+            reverse=True
+        )
+
+
+        # ------------------------------------------------------
+        # LIMIT FINAL RESULTS
+        # ------------------------------------------------------
+
+        combined_records = combined_records[:100]
+
+
         return jsonify({
-            "records": response.data
+            "records": combined_records
         })
+
 
     except Exception as e:
 
