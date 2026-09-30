@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Medication Verification</title>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        body{
+            font-family: Arial,sans-serif;
+            max-width:700px;
+            margin:auto;
+            padding:20px;
+        }
+
+        #reader{
+            width:100%;
+            margin-top:20px;
+        }
+
+        .box{
+            padding:15px;
+            border:1px solid #ddd;
+            border-radius:10px;
+            margin-top:15px;
+        }
+
+        button{
+            padding:12px 16px;
+            margin-top:10px;
+            cursor:pointer;
+        }
+
+        .success{
+            color:green;
+            font-weight:bold;
+        }
+
+        .fail{
+            color:red;
+            font-weight:bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>QR Medication Verification</h1>
+
+<input
+    id="staff-id"
+    placeholder="Enter Staff ID"
+/>
+
+<br>
+
+<button id="start-btn">
+    Start Verification
+</button>
+
+<div id="reader"></div>
+
+<div class="box">
+    <h3>Medication QR</h3>
+    <div id="med-id">Not scanned</div>
+</div>
+
+<div class="box">
+    <h3>Label QR</h3>
+    <div id="label-id">Not scanned</div>
+</div>
+
+<div class="box">
+    <h3>Result</h3>
+    <div id="result">Waiting...</div>
+</div>
+
+<script>
+
+let medicationId = null;
+let labelId = null;
+
+let currentStep = "medication";
+
+let scanner = null;
+
+function compareIds(){
+
+    if(!medicationId || !labelId){
+        return;
+    }
+
+    const result = document.getElementById("result");
+
+    if(medicationId === labelId){
+
+        result.innerHTML =
+            '<span class="success">✅ MATCH</span>';
+
+    }else{
+
+        result.innerHTML =
+            '<span class="fail">❌ DO NOT MATCH</span>';
+
+    }
+}
+
+document.getElementById("start-btn")
+.addEventListener("click", () => {
+
+    const staffId =
+        document.getElementById("staff-id").value.trim();
+
+    if(!staffId){
+
+        alert("Please enter Staff ID");
+
+        return;
+    }
+
+    scanner = new Html5Qrcode("reader");
+
+    scanner.start(
+        {
+            facingMode: "environment"
+        },
+        {
+            fps: 10,
+            qrbox: 250
+        },
+        (decodedText) => {
+
+            if(currentStep === "medication"){
+
+                medicationId = decodedText;
+
+                document.getElementById("med-id")
+                    .innerText = decodedText;
+
+                currentStep = "label";
+
+                alert(
+                    "Medication QR scanned.\nNow scan the prescription label QR."
+                );
+
+                return;
+            }
+
+            if(currentStep === "label"){
+
+                labelId = decodedText;
+
+                document.getElementById("label-id")
+                    .innerText = decodedText;
+
+                scanner.stop();
+
+                compareIds();
+            }
+
+        }
+    );
+
+});
+
+</script>
+
+</body>
+</html>
