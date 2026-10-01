@@ -2,6 +2,19 @@
 
 An AI-powered web application designed to assist healthcare professionals with medication verification by comparing **physical medication packaging** against a **prescription/cartfill label**.
 
+## 🎯 Project Overview
+
+This project explores how AI and machine-readable product identifiers
+could be used to support medication verification workflows.
+
+It was developed from a pharmacy/healthcare perspective, with a focus
+on creating a practical workflow that could be used by healthcare
+professionals while maintaining a clear distinction between:
+
+- AI-assisted verification
+- deterministic barcode/QR verification
+- human professional verification
+
 The system provides two complementary verification workflows:
 
 1. **AI Medication Verification** — uses images of medication packaging and a prescription/cartfill label for AI-assisted comparison.
